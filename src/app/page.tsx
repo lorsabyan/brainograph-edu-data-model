@@ -42,9 +42,13 @@ function WorkspacePortal() {
 
   const [userRole, setUserRole] = useState<"learner" | "instructor">("learner");
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedLearnerGrade, setSelectedLearnerGrade] = useState<string>("7-րդ դասարան");
+  const [selectedInstructorGrades, setSelectedInstructorGrades] = useState<string[]>(["7-րդ դասարան", "8-րդ դասարան"]);
+  const [activeTab, setActiveTab] = useState<"discover" | "my-space">("discover");
 
   const handleRoleChange = (role: "learner" | "instructor") => {
     setUserRole(role);
+    setActiveTab(role === "learner" ? "discover" : "my-space");
   };
   
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
@@ -140,10 +144,10 @@ function WorkspacePortal() {
     setSearchQuery("");
   };
 
-  const handleSelectProgram = (programId: string | null) => {
+  const handleSelectProgram = (programId: string | null, nodeId?: string | null) => {
     updateQueryParams({
       program: programId,
-      node: null,
+      node: nodeId || null,
       q: null,
     });
     setSelectedFilters({});
@@ -341,6 +345,14 @@ function WorkspacePortal() {
             onEditOrg={(id) => setEditingOrgId(id)}
             onEditProgram={(id) => setEditingProgramId(id)}
             isEditMode={isEditMode}
+            userRole={userRole}
+            selectedLearnerGrade={selectedLearnerGrade}
+            onSelectLearnerGrade={setSelectedLearnerGrade}
+            selectedInstructorGrades={selectedInstructorGrades}
+            onSelectInstructorGrades={setSelectedInstructorGrades}
+            activeTab={activeTab}
+            onChangeTab={setActiveTab}
+            allNodes={allNodes}
           />
         ) : (
           <>
