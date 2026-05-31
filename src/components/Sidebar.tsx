@@ -119,26 +119,20 @@ export default function Sidebar({
         </div>
 
         {/* Edit Mode Toggle */}
-        {userRole === "instructor" ? (
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-accent/40 border border-border/50 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="space-y-0.5">
-              <Label htmlFor="edit-mode-switch" className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
-                <Edit3 className="h-3.5 w-3.5 text-primary" />
-                Խմբագրել
-              </Label>
-              <span className="text-[10px] text-muted-foreground block">Միացնել փոփոխությունները</span>
-            </div>
-            <Switch
-              id="edit-mode-switch"
-              checked={isEditMode}
-              onCheckedChange={onEditModeChange}
-            />
+        <div className="flex items-center justify-between p-2.5 rounded-lg bg-accent/40 border border-border/50">
+          <div className="space-y-0.5">
+            <Label htmlFor="edit-mode-switch" className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+              <Edit3 className="h-3.5 w-3.5 text-primary" />
+              Խմբագրել
+            </Label>
+            <span className="text-[10px] text-muted-foreground block">Միացնել փոփոխությունները</span>
           </div>
-        ) : (
-          <div className="p-2.5 rounded-lg bg-muted/40 border border-dashed border-border/40 text-center">
-            <span className="text-[10px] text-muted-foreground">Դիտման ռեժիմ (Սովորող)</span>
-          </div>
-        )}
+          <Switch
+            id="edit-mode-switch"
+            checked={isEditMode}
+            onCheckedChange={onEditModeChange}
+          />
+        </div>
       </div>
     </div>
   );

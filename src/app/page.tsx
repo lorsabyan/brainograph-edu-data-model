@@ -45,9 +45,6 @@ function WorkspacePortal() {
 
   const handleRoleChange = (role: "learner" | "instructor") => {
     setUserRole(role);
-    if (role === "learner") {
-      setIsEditMode(false);
-    }
   };
   
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
