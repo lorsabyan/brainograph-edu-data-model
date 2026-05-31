@@ -14,7 +14,8 @@ import {
   Layout, 
   FolderHeart,
   RotateCcw,
-  Plus
+  Plus,
+  Edit3
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ interface PortalViewProps {
   onAddOrg: () => void;
   onAddProgram: () => void;
   onAddTemplate: () => void;
+  onEditOrg?: (id: string) => void;
+  onEditProgram?: (id: string) => void;
   isEditMode: boolean;
 }
 
@@ -37,6 +40,8 @@ export default function PortalView({
   onAddOrg,
   onAddProgram,
   onAddTemplate,
+  onEditOrg,
+  onEditProgram,
   isEditMode
 }: PortalViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -324,14 +329,30 @@ export default function PortalView({
                 const GroupIcon = group.icon;
                 return (
                   <div key={group.id} className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300">
-                    <div className="flex items-center space-x-3 border-b border-border/50 pb-4">
-                      <div className="h-10 w-10 rounded-xl bg-accent/70 flex items-center justify-center shrink-0 border border-border/40">
-                        <GroupIcon className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 rounded-xl bg-accent/70 flex items-center justify-center shrink-0 border border-border/40">
+                          <GroupIcon className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold tracking-tight">{group.title}</h2>
+                          <p className="text-sm text-muted-foreground">{group.subtitle}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold tracking-tight">{group.title}</h2>
-                        <p className="text-sm text-muted-foreground">{group.subtitle}</p>
-                      </div>
+                      {isEditMode && groupBy === 'org' && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditOrg?.(group.id);
+                          }}
+                          title="Խմբագրել հաստատությունը"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -360,11 +381,27 @@ export default function PortalView({
                                   <StructureIcon className="h-3 w-3" />
                                   {tMeta.name}
                                 </span>
-                                {groupBy === 'audience' && (
-                                  <span className="text-xs font-semibold text-muted-foreground truncate max-w-[150px]" title={organizations.find(o => o.id === program.organizationId)?.name}>
-                                    {organizations.find(o => o.id === program.organizationId)?.name.replace(" Հիմնադրամ", "").replace(" (ԵՊՀ)", "").replace(" (UNDP)", "")}
-                                  </span>
-                                )}
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  {groupBy === 'audience' && (
+                                    <span className="text-xs font-semibold text-muted-foreground truncate max-w-[120px]" title={organizations.find(o => o.id === program.organizationId)?.name}>
+                                      {organizations.find(o => o.id === program.organizationId)?.name.replace(" Հիմնադրամ", "").replace(" (ԵՊՀ)", "").replace(" (UNDP)", "")}
+                                    </span>
+                                  )}
+                                  {isEditMode && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md z-20 shrink-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEditProgram?.(program.id);
+                                      }}
+                                      title="Խմբագրել առարկան"
+                                    >
+                                      <Edit3 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                               
                               <div className="space-y-1.5">

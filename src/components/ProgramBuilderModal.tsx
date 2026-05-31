@@ -13,6 +13,7 @@ interface ProgramBuilderModalProps {
   onSave: (program: Program) => void;
   organizations: Organization[];
   templates: HierarchyTemplate[];
+  editingProgram?: Program | null;
 }
 
 const PRESET_COLORS = [
@@ -38,32 +39,41 @@ export default function ProgramBuilderModal({
   onClose,
   onSave,
   organizations,
-  templates
+  templates,
+  editingProgram
 }: ProgramBuilderModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [orgId, setOrgId] = useState(organizations[0]?.id || "");
-  const [templateId, setTemplateId] = useState(templates[0]?.id || "");
+  const [orgId, setOrgId] = useState("");
+  const [templateId, setTemplateId] = useState("");
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
   const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
   const [curriculum, setCurriculum] = useState("");
 
-  // Sync state if organizations or templates change
+  // Sync state if editingProgram or organizations/templates change
   React.useEffect(() => {
-    if (organizations.length > 0 && !orgId) {
-      setOrgId(organizations[0].id);
+    if (editingProgram) {
+      setTitle(editingProgram.title);
+      setDescription(editingProgram.description);
+      setOrgId(editingProgram.organizationId);
+      setTemplateId(editingProgram.templateId);
+      setSelectedColor(editingProgram.color || PRESET_COLORS[0]);
+      setSelectedAudiences(editingProgram.targetAudience || []);
+      setCurriculum(editingProgram.curriculum || "");
+    } else {
+      setTitle("");
+      setDescription("");
+      setOrgId(organizations[0]?.id || "");
+      setTemplateId(templates[0]?.id || "");
+      setSelectedColor(PRESET_COLORS[0]);
+      setSelectedAudiences([]);
+      setCurriculum("");
     }
-  }, [organizations, orgId]);
-
-  React.useEffect(() => {
-    if (templates.length > 0 && !templateId) {
-      setTemplateId(templates[0].id);
-    }
-  }, [templates, templateId]);
+  }, [editingProgram, open, organizations, templates]);
 
   const handleSave = () => {
     const newProgram: Program = {
-      id: `prog_${Date.now()}`,
+      id: editingProgram ? editingProgram.id : `prog_${Date.now()}`,
       organizationId: orgId,
       templateId,
       title,
@@ -74,11 +84,6 @@ export default function ProgramBuilderModal({
     };
     onSave(newProgram);
     onClose();
-    // Reset form
-    setTitle("");
-    setDescription("");
-    setSelectedAudiences([]);
-    setCurriculum("");
   };
 
   const isFormValid = title.trim() !== "" && orgId !== "" && templateId !== "";
@@ -87,9 +92,11 @@ export default function ProgramBuilderModal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[450px] flex flex-col p-0 gap-0 overflow-hidden rounded-2xl bg-background border-border shadow-xl">
         <DialogHeader className="px-6 py-4 border-b border-border/40 shrink-0">
-          <DialogTitle className="text-xl font-semibold">Ստեղծել Ուսումնական Առարկա</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {editingProgram ? "Խմբագրել Ուսումնական Առարկան" : "Ստեղծել Ուսումնական Առարկա"}
+          </DialogTitle>
           <DialogDescription>
-            Ավելացրեք նոր ուսումնական առարկա ձեր հաստատության համար։
+            {editingProgram ? "Փոփոխեք առարկայի տվյալները ձեր հաստատության համար։" : "Ավելացրեք նոր ուսումնական առարկա ձեր հաստատության համար։"}
           </DialogDescription>
         </DialogHeader>
 
@@ -145,6 +152,7 @@ export default function ProgramBuilderModal({
             <select
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}
+              disabled={!!editingProgram}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {templates.map((tpl) => (

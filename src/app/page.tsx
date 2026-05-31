@@ -54,6 +54,9 @@ function WorkspacePortal() {
   const [isBuildingOrg, setIsBuildingOrg] = useState(false);
   const [isBuildingProgram, setIsBuildingProgram] = useState(false);
 
+  const [editingOrgId, setEditingOrgId] = useState<string | null>(null);
+  const [editingProgramId, setEditingProgramId] = useState<string | null>(null);
+
   const activeProgram = programs.find(p => p.id === activeProgramId) || null;
   const [activeTemplateId, setActiveTemplateId] = useState<string>(initialTemplates[0].id);
   const activeTemplate = templates.find(t => t.id === activeTemplateId) || templates[0];
@@ -268,9 +271,15 @@ function WorkspacePortal() {
     setIsAddingShortcut(false);
   };
 
-  const handleSaveTemplate = (newTemplate: HierarchyTemplate) => {
-    setTemplates(prev => [...prev, newTemplate]);
-    setActiveTemplateId(newTemplate.id);
+  const handleSaveTemplate = (template: HierarchyTemplate) => {
+    setTemplates(prev => {
+      const exists = prev.some(t => t.id === template.id);
+      if (exists) {
+        return prev.map(t => t.id === template.id ? template : t);
+      }
+      return [...prev, template];
+    });
+    setActiveTemplateId(template.id);
     updateQueryParams({
       node: null,
       q: null,
@@ -280,15 +289,32 @@ function WorkspacePortal() {
   };
 
   const handleSaveOrg = (newOrg: Organization) => {
-    setOrganizations(prev => [...prev, newOrg]);
-    handleGoHome();
+    setOrganizations(prev => {
+      const exists = prev.some(o => o.id === newOrg.id);
+      if (exists) {
+        return prev.map(o => o.id === newOrg.id ? newOrg : o);
+      }
+      return [...prev, newOrg];
+    });
+    setEditingOrgId(null);
+    setIsBuildingOrg(false);
   };
 
   const handleSaveProgram = (newProgram: Program) => {
-    setPrograms(prev => [...prev, newProgram]);
+    setPrograms(prev => {
+      const exists = prev.some(p => p.id === newProgram.id);
+      if (exists) {
+        return prev.map(p => p.id === newProgram.id ? newProgram : p);
+      }
+      return [...prev, newProgram];
+    });
+    setEditingProgramId(null);
+    setIsBuildingProgram(false);
   };
 
   const shortcutsOnly = virtualTree.filter(n => n.type === 'shortcut');
+  const editingOrg = editingOrgId ? organizations.find(o => o.id === editingOrgId) || null : null;
+  const editingProgram = editingProgramId ? programs.find(p => p.id === editingProgramId) || null : null;
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
@@ -312,6 +338,8 @@ function WorkspacePortal() {
             onAddOrg={() => setIsBuildingOrg(true)}
             onAddProgram={() => setIsBuildingProgram(true)}
             onAddTemplate={() => setIsBuildingTemplate(true)}
+            onEditOrg={(id) => setEditingOrgId(id)}
+            onEditProgram={(id) => setEditingProgramId(id)}
             isEditMode={isEditMode}
           />
         ) : (
@@ -391,20 +419,29 @@ function WorkspacePortal() {
         open={isBuildingTemplate}
         onClose={() => setIsBuildingTemplate(false)}
         onSave={handleSaveTemplate}
+        templates={templates}
       />
 
       <OrganizationBuilderModal 
-        open={isBuildingOrg}
-        onClose={() => setIsBuildingOrg(false)}
+        open={isBuildingOrg || !!editingOrgId}
+        onClose={() => {
+          setIsBuildingOrg(false);
+          setEditingOrgId(null);
+        }}
         onSave={handleSaveOrg}
+        editingOrg={editingOrg}
       />
 
       <ProgramBuilderModal 
-        open={isBuildingProgram}
-        onClose={() => setIsBuildingProgram(false)}
+        open={isBuildingProgram || !!editingProgramId}
+        onClose={() => {
+          setIsBuildingProgram(false);
+          setEditingProgramId(null);
+        }}
         onSave={handleSaveProgram}
         organizations={organizations}
         templates={templates}
+        editingProgram={editingProgram}
       />
     </div>
   );
