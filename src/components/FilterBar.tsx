@@ -22,6 +22,7 @@ interface FilterBarProps {
   setActiveTemplateId: (id: string) => void;
   onManageTemplates: () => void;
   allNodes: ContentNode[];
+  isEditMode: boolean;
 }
 
 export default function FilterBar({
@@ -36,7 +37,8 @@ export default function FilterBar({
   activeTemplateId,
   setActiveTemplateId,
   onManageTemplates,
-  allNodes
+  allNodes,
+  isEditMode
 }: FilterBarProps) {
   
   const clearFilters = () => {
@@ -179,10 +181,12 @@ export default function FilterBar({
           </PopoverContent>
         </Popover>
 
-        <Button variant="secondary" size="sm" className="h-8" onClick={onAddShortcut}>
-          <BookmarkPlus className="h-4 w-4 mr-2" />
-          Ստեղծել
-        </Button>
+        {isEditMode && (
+          <Button variant="secondary" size="sm" className="h-8" onClick={onAddShortcut}>
+            <BookmarkPlus className="h-4 w-4 mr-2" />
+            Ստեղծել
+          </Button>
+        )}
       </div>
 
     </div>

@@ -26,6 +26,13 @@ const PRESET_COLORS = [
   "#14b8a6", // Teal
 ];
 
+const AUDIENCES = [
+  { id: "դպրոցական", label: "Դպրոցական" },
+  { id: "դպրոցական հավելյալ", label: "Դպրոցական հավելյալ" },
+  { id: "բուհական", label: "Բուհական" },
+  { id: "մասնագիտական", label: "Մասնագիտական" }
+];
+
 export default function ProgramBuilderModal({
   open,
   onClose,
@@ -38,6 +45,7 @@ export default function ProgramBuilderModal({
   const [orgId, setOrgId] = useState(organizations[0]?.id || "");
   const [templateId, setTemplateId] = useState(templates[0]?.id || "");
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
+  const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
 
   // Sync state if organizations or templates change
   React.useEffect(() => {
@@ -59,13 +67,15 @@ export default function ProgramBuilderModal({
       templateId,
       title,
       description,
-      color: selectedColor
+      color: selectedColor,
+      targetAudience: selectedAudiences
     };
     onSave(newProgram);
     onClose();
     // Reset form
     setTitle("");
     setDescription("");
+    setSelectedAudiences([]);
   };
 
   const isFormValid = title.trim() !== "" && orgId !== "" && templateId !== "";
@@ -130,6 +140,35 @@ export default function ProgramBuilderModal({
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Թիրախային Լսարան (Target Audience)</Label>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {AUDIENCES.map((aud) => {
+                const checked = selectedAudiences.includes(aud.id);
+                return (
+                  <label
+                    key={aud.id}
+                    className="flex items-center space-x-2 text-sm select-none cursor-pointer border border-border/60 hover:border-border rounded-lg p-2 transition-colors bg-card hover:bg-accent/10"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        if (checked) {
+                          setSelectedAudiences(selectedAudiences.filter(id => id !== aud.id));
+                        } else {
+                          setSelectedAudiences([...selectedAudiences, aud.id]);
+                        }
+                      }}
+                      className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span className="text-foreground/90 font-medium">{aud.label}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-2">

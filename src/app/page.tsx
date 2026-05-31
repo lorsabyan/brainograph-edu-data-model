@@ -39,6 +39,16 @@ function WorkspacePortal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [playingNodeId, setPlayingNodeId] = useState<string | null>(null);
+
+  const [userRole, setUserRole] = useState<"learner" | "instructor">("learner");
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleRoleChange = (role: "learner" | "instructor") => {
+    setUserRole(role);
+    if (role === "learner") {
+      setIsEditMode(false);
+    }
+  };
   
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [isAddingNode, setIsAddingNode] = useState(false);
@@ -290,6 +300,10 @@ function WorkspacePortal() {
         currentNodeId={currentNodeId}
         activeProgramId={activeProgramId}
         onSelectProgram={handleSelectProgram}
+        userRole={userRole}
+        onRoleChange={handleRoleChange}
+        isEditMode={isEditMode}
+        onEditModeChange={setIsEditMode}
       />
       
       <div className="flex-1 flex flex-col min-w-0">
@@ -301,6 +315,7 @@ function WorkspacePortal() {
             onAddOrg={() => setIsBuildingOrg(true)}
             onAddProgram={() => setIsBuildingProgram(true)}
             onAddTemplate={() => setIsBuildingTemplate(true)}
+            isEditMode={isEditMode}
           />
         ) : (
           <>
@@ -313,6 +328,7 @@ function WorkspacePortal() {
               setViewMode={(mode) => updateQueryParams({ view: mode }, { replace: true })}
               onAddNode={() => setIsAddingNode(true)}
               virtualTree={virtualTree}
+              isEditMode={isEditMode}
             />
             
             <FilterBar 
@@ -330,6 +346,7 @@ function WorkspacePortal() {
               setActiveTemplateId={setActiveTemplateId}
               onManageTemplates={() => setIsBuildingTemplate(true)}
               allNodes={currentTemplateNodes}
+              isEditMode={isEditMode}
             />
             
             {viewMode === "column" && !searchQuery ? (
@@ -340,6 +357,7 @@ function WorkspacePortal() {
                 onPlayClick={setPlayingNodeId}
                 onEditClick={setEditingNodeId}
                 onAddNode={() => setIsAddingNode(true)}
+                isEditMode={isEditMode}
               />
             ) : (
               <FolderView 
@@ -348,6 +366,7 @@ function WorkspacePortal() {
                 onPlayClick={setPlayingNodeId}
                 onEditClick={setEditingNodeId}
                 viewMode={viewMode === "column" ? "grid" : viewMode}
+                isEditMode={isEditMode}
               />
             )}
           </>

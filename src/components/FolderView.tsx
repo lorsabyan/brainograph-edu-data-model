@@ -12,6 +12,7 @@ interface FolderViewProps {
   onPlayClick: (id: string) => void;
   onEditClick: (id: string) => void;
   viewMode: "grid" | "list";
+  isEditMode: boolean;
 }
 
 export default function FolderView({
@@ -20,6 +21,7 @@ export default function FolderView({
   onPlayClick,
   onEditClick,
   viewMode,
+  isEditMode
 }: FolderViewProps) {
   
   if (nodes.length === 0) {
@@ -96,18 +98,20 @@ export default function FolderView({
                   </div>
 
                   <div className={isGrid ? "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center bg-background/80 backdrop-blur-sm rounded-full shadow-sm p-0.5" : "opacity-0 group-hover:opacity-100 transition-opacity ml-auto flex items-center shrink-0"}>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full mr-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditClick(node.id);
-                      }}
-                      title="Խմբագրել"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    {isEditMode && (
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full mr-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditClick(node.id);
+                        }}
+                        title="Խմբագրել"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                     {node.metadata?.isPlayable && (
                       <Button 
                         size="icon" 

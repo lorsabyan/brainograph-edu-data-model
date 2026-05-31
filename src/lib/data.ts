@@ -29,6 +29,7 @@ export interface Program {
   templateId: string;
   color?: string;
   imageUrl?: string;
+  targetAudience?: string[];
 }
 
 export interface ContentNode {
@@ -134,21 +135,26 @@ const colors = [
 ];
 
 export const initialPrograms: Program[] = [
-  ...subjects.map((subj, index) => ({
-    id: `prog_${index}`,
-    title: subj,
-    description: 'Աշխարհացույց նախագծի շրջանակներում ստեղծված ուսումնական նյութեր',
-    organizationId: 'org_vaf',
-    templateId: subj === 'Նախագծային աշխատանք' || subj === 'Սիմֆոնիկ ԴասA' || subj === 'Կլիմայական արկղիկ' ? 'tpl_freeform' : 'tpl_subject',
-    color: colors[index]
-  })),
+  ...subjects.map((subj, index) => {
+    const isSupplementary = subj === 'Նախագծային աշխատանք' || subj === 'Սիմֆոնիկ ԴասA' || subj === 'Կլիմայական արկղիկ' || subj === 'Իմ Աշխարհացույցը';
+    return {
+      id: `prog_${index}`,
+      title: subj,
+      description: 'Աշխարհացույց նախագծի շրջանակներում ստեղծված ուսումնական նյութեր',
+      organizationId: 'org_vaf',
+      templateId: subj === 'Նախագծային աշխատանք' || subj === 'Սիմֆոնիկ ԴասA' || subj === 'Կլիմայական արկղիկ' ? 'tpl_freeform' : 'tpl_subject',
+      color: colors[index],
+      targetAudience: isSupplementary ? ['դպրոցական հավելյալ'] : ['դպրոցական']
+    };
+  }),
   {
     id: 'prog_ayb_1',
     title: 'Արարատյան Բակալավրիատ. Մաթեմատիկա',
     description: 'Այբ կրթական հիմնադրամի մաթեմատիկայի ծրագիր',
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
-    color: '#f97316'
+    color: '#f97316',
+    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ']
   },
   {
     id: 'prog_ayb_2',
@@ -156,7 +162,8 @@ export const initialPrograms: Program[] = [
     description: 'Այբ կրթական հիմնադրամի ֆիզիկայի ծրագիր',
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
-    color: '#ef4444'
+    color: '#ef4444',
+    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ']
   },
   {
     id: 'prog_ysu_1',
@@ -164,7 +171,8 @@ export const initialPrograms: Program[] = [
     description: 'Բակալավրի կրթական ծրագիր',
     organizationId: 'org_ysu',
     templateId: 'tpl_university',
-    color: '#0284c7'
+    color: '#0284c7',
+    targetAudience: ['բուհական']
   },
   {
     id: 'prog_ysu_2',
@@ -172,7 +180,8 @@ export const initialPrograms: Program[] = [
     description: 'Բակալավրի կրթական ծրագիր',
     organizationId: 'org_ysu',
     templateId: 'tpl_university',
-    color: '#4338ca'
+    color: '#4338ca',
+    targetAudience: ['բուհական']
   },
   {
     id: 'prog_undp_1',
@@ -180,7 +189,8 @@ export const initialPrograms: Program[] = [
     description: 'Համայնքային զարգացման ծրագիր',
     organizationId: 'org_undp',
     templateId: 'tpl_course',
-    color: '#059669'
+    color: '#059669',
+    targetAudience: ['մասնագիտական']
   },
   {
     id: 'prog_cba_1',
@@ -188,7 +198,8 @@ export const initialPrograms: Program[] = [
     description: 'Անձնական ֆինանսների կառավարում և խնայողություններ դպրոցականների համար',
     organizationId: 'org_cba',
     templateId: 'tpl_course',
-    color: '#16a34a'
+    color: '#16a34a',
+    targetAudience: ['դպրոցական', 'մասնագիտական']
   },
   {
     id: 'prog_museum_1',
@@ -196,7 +207,8 @@ export const initialPrograms: Program[] = [
     description: 'Հայաստանի պատմության և մշակույթի վիրտուալ ցուցասրահներ',
     organizationId: 'org_museum',
     templateId: 'tpl_museum',
-    color: '#9ca3af'
+    color: '#9ca3af',
+    targetAudience: ['դպրոցական հավելյալ', 'մասնագիտական']
   },
   {
     id: 'prog_polytech_1',
@@ -204,7 +216,8 @@ export const initialPrograms: Program[] = [
     description: 'Մեքենայական ուսուցման հիմունքներ և կիրառություններ',
     organizationId: 'org_polytech',
     templateId: 'tpl_university',
-    color: '#dc2626'
+    color: '#dc2626',
+    targetAudience: ['բուհական']
   },
   {
     id: 'prog_ind_1',
@@ -212,7 +225,8 @@ export const initialPrograms: Program[] = [
     description: 'Պրակտիկ դասընթաց',
     organizationId: 'org_ind',
     templateId: 'tpl_course',
-    color: '#db2777'
+    color: '#db2777',
+    targetAudience: ['մասնագիտական']
   }
 ];
 

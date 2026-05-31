@@ -27,6 +27,7 @@ interface PortalViewProps {
   onAddOrg: () => void;
   onAddProgram: () => void;
   onAddTemplate: () => void;
+  isEditMode: boolean;
 }
 
 export default function PortalView({ 
@@ -35,11 +36,21 @@ export default function PortalView({
   onSelectProgram,
   onAddOrg,
   onAddProgram,
-  onAddTemplate
+  onAddTemplate,
+  isEditMode
 }: PortalViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+  const [selectedAudience, setSelectedAudience] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<'org' | 'audience'>('org');
+
+  const AUDIENCE_GROUPS = useMemo(() => [
+    { id: "դպրոցական", name: "Դպրոցական", icon: GraduationCap, description: "Հանրակրթական հիմնական առարկաներ և դասարաններ" },
+    { id: "դպրոցական հավելյալ", name: "Դպրոցական հավելյալ", icon: FolderHeart, description: "Արտադասարանական, նախագծային և օժանդակ նյութեր" },
+    { id: "բուհական", name: "Բուհական", icon: BookOpen, description: "Բարձրագույն ուսումնական հաստատությունների ծրագրեր" },
+    { id: "մասնագիտական", name: "Մասնագիտական", icon: Layout, description: "Մասնագիտական վերապատրաստումներ և հատուկ դասընթացներ" }
+  ], []);
 
   // Template helper names and icons in Armenian
   const templateMetadata = {
@@ -82,9 +93,16 @@ export default function PortalView({
         return false;
       }
 
+      // 4. Target Audience Filter
+      if (selectedAudience) {
+        if (!program.targetAudience || !program.targetAudience.includes(selectedAudience)) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [programs, organizations, searchQuery, selectedTemplateId, selectedOrgId]);
+  }, [programs, organizations, searchQuery, selectedTemplateId, selectedOrgId, selectedAudience]);
 
   // Group filtered programs by organization
   const programsByOrg = useMemo(() => {
@@ -96,10 +114,40 @@ export default function PortalView({
       .filter(org => org.programs.length > 0);
   }, [organizations, filteredPrograms]);
 
+  // Group filtered programs by target audience
+  const programsByAudience = useMemo(() => {
+    return AUDIENCE_GROUPS.map(group => ({
+      ...group,
+      programs: filteredPrograms.filter(p => p.targetAudience?.includes(group.id))
+    })).filter(g => g.programs.length > 0);
+  }, [filteredPrograms, AUDIENCE_GROUPS]);
+
+  // Combined grouped results based on groupBy setting
+  const groups = useMemo(() => {
+    if (groupBy === 'org') {
+      return programsByOrg.map(org => ({
+        id: org.id,
+        title: org.name,
+        subtitle: `Առաջարկում է ${org.programs.length} ծրագիր`,
+        icon: Building2,
+        programs: org.programs
+      }));
+    } else {
+      return programsByAudience.map(aud => ({
+        id: aud.id,
+        title: aud.name,
+        subtitle: aud.description,
+        icon: aud.icon,
+        programs: aud.programs
+      }));
+    }
+  }, [groupBy, programsByOrg, programsByAudience]);
+
   const handleResetFilters = () => {
     setSearchQuery("");
     setSelectedTemplateId(null);
     setSelectedOrgId(null);
+    setSelectedAudience(null);
   };
 
   return (
@@ -116,20 +164,22 @@ export default function PortalView({
               Գտեք լավագույն կրթական նյութերը, դասընթացները և պլանները՝ ստեղծված առաջատար հաստատությունների կողմից։
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 shrink-0">
-            <Button onClick={onAddOrg} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
-              <Plus className="h-4 w-4 text-muted-foreground" />
-              Նոր Հաստատություն
-            </Button>
-            <Button onClick={onAddTemplate} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
-              <Plus className="h-4 w-4 text-muted-foreground" />
-              Նոր Կաղապար
-            </Button>
-            <Button onClick={onAddProgram} className="rounded-2xl px-5 h-11 shadow-md gap-2 transition-all">
-              <Plus className="h-4 w-4 text-primary-foreground" />
-              Նոր Ծրագիր
-            </Button>
-          </div>
+          {isEditMode && (
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 shrink-0">
+              <Button onClick={onAddOrg} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
+                <Plus className="h-4 w-4 text-muted-foreground" />
+                Նոր Հաստատություն
+              </Button>
+              <Button onClick={onAddTemplate} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
+                <Plus className="h-4 w-4 text-muted-foreground" />
+                Նոր Կաղապար
+              </Button>
+              <Button onClick={onAddProgram} className="rounded-2xl px-5 h-11 shadow-md gap-2 transition-all">
+                <Plus className="h-4 w-4 text-primary-foreground" />
+                Նոր Ծրագիր
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Search and Filters panel */}
@@ -159,7 +209,7 @@ export default function PortalView({
             </div>
 
             {/* Reset Filters Quick Button */}
-            {(searchQuery || selectedTemplateId || selectedOrgId) && (
+            {(searchQuery || selectedTemplateId || selectedOrgId || selectedAudience) && (
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
@@ -213,6 +263,41 @@ export default function PortalView({
               })}
             </div>
 
+            {/* Target Audience Filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
+                <GraduationCap className="h-3 w-3" />
+                Լսարան՝
+              </span>
+              <button
+                onClick={() => setSelectedAudience(null)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border ${
+                  selectedAudience === null
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
+                }`}
+              >
+                Բոլորը
+              </button>
+              {AUDIENCE_GROUPS.map(aud => {
+                const IconComponent = aud.icon;
+                return (
+                  <button
+                    key={aud.id}
+                    onClick={() => setSelectedAudience(aud.id)}
+                    className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border flex items-center gap-1.5 ${
+                      selectedAudience === aud.id
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <IconComponent className="h-3.5 w-3.5" />
+                    {aud.name}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Organization Filter */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
@@ -230,9 +315,11 @@ export default function PortalView({
                 Բոլորը
               </button>
               {organizations.map(org => {
-                // Only show orgs that have matching programs after filtering by template
+                // Only show orgs that have matching programs after filtering by template and audience
                 const hasMatchingPrograms = programs.some(
-                  p => p.organizationId === org.id && (!selectedTemplateId || p.templateId === selectedTemplateId)
+                  p => p.organizationId === org.id && 
+                       (!selectedTemplateId || p.templateId === selectedTemplateId) &&
+                       (!selectedAudience || p.targetAudience?.includes(selectedAudience))
                 );
                 if (!hasMatchingPrograms) return null;
 
@@ -255,92 +342,129 @@ export default function PortalView({
         </div>
 
         {/* Dynamic Grid Results */}
-        {programsByOrg.length > 0 ? (
-          <div className="space-y-12">
-            {programsByOrg.map(org => (
-              <div key={org.id} className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300">
-                <div className="flex items-center space-x-3 border-b border-border/50 pb-4">
-                  <div className="h-10 w-10 rounded-xl bg-accent/70 flex items-center justify-center shrink-0 border border-border/40">
-                    <Building2 className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{org.name}</h2>
-                    <p className="text-sm text-muted-foreground">Առաջարկում է {org.programs.length} ծրագիր</p>
-                  </div>
-                </div>
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
+            <h2 className="text-xl font-bold text-foreground/80 flex items-center gap-2">
+              {groupBy === 'org' ? 'Ծրագրերն ըստ Հաստատությունների' : 'Ծրագրերն ըստ Թիրախային Լսարանի'}
+            </h2>
+            <div className="flex items-center gap-1.5 bg-muted/50 p-1 rounded-xl border border-border/40 w-fit self-end sm:self-auto shrink-0">
+              <button
+                onClick={() => setGroupBy('org')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  groupBy === 'org'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Ըստ Հաստատությունների
+              </button>
+              <button
+                onClick={() => setGroupBy('audience')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  groupBy === 'audience'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Ըստ Թիրախային Լսարանի
+              </button>
+            </div>
+          </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {org.programs.map(program => {
-                    const tMeta = templateMetadata[program.templateId as keyof typeof templateMetadata] || {
-                      name: "Այլ",
-                      icon: GraduationCap,
-                      color: "text-muted-foreground bg-muted border-border/50"
-                    };
-                    const StructureIcon = tMeta.icon;
-
-                    return (
-                      <div 
-                        key={program.id}
-                        onClick={() => onSelectProgram(program.id)}
-                        className="group relative flex flex-col justify-between p-6 rounded-2xl border border-border/50 bg-card hover:bg-accent/30 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md h-52 overflow-hidden"
-                      >
-                        <div 
-                          className="absolute inset-0 opacity-5 transition-opacity group-hover:opacity-10"
-                          style={{ backgroundColor: program.color || '#3b82f6' }}
-                        />
-                        
-                        <div className="relative z-10 space-y-3">
-                          <div className="flex justify-between items-start gap-2">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${tMeta.color}`}>
-                              <StructureIcon className="h-3 w-3" />
-                              {tMeta.name}
-                            </span>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <h3 className="font-bold text-lg leading-tight line-clamp-2 text-foreground group-hover:text-primary transition-colors">
-                              {program.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                              {program.description}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="relative z-10 flex items-center text-xs font-semibold mt-4 text-muted-foreground group-hover:text-primary transition-all">
-                          Դիտել ծրագիրը
-                          <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                        </div>
+          {groups.length > 0 ? (
+            <div className="space-y-12">
+              {groups.map(group => {
+                const GroupIcon = group.icon;
+                return (
+                  <div key={group.id} className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300">
+                    <div className="flex items-center space-x-3 border-b border-border/50 pb-4">
+                      <div className="h-10 w-10 rounded-xl bg-accent/70 flex items-center justify-center shrink-0 border border-border/40">
+                        <GroupIcon className="h-5 w-5 text-muted-foreground" />
                       </div>
-                    );
-                  })}
-                </div>
+                      <div>
+                        <h2 className="text-2xl font-bold tracking-tight">{group.title}</h2>
+                        <p className="text-sm text-muted-foreground">{group.subtitle}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {group.programs.map(program => {
+                        const tMeta = templateMetadata[program.templateId as keyof typeof templateMetadata] || {
+                          name: "Այլ",
+                          icon: GraduationCap,
+                          color: "text-muted-foreground bg-muted border-border/50"
+                        };
+                        const StructureIcon = tMeta.icon;
+
+                        return (
+                          <div 
+                            key={program.id}
+                            onClick={() => onSelectProgram(program.id)}
+                            className="group relative flex flex-col justify-between p-6 rounded-2xl border border-border/50 bg-card hover:bg-accent/30 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md h-52 overflow-hidden"
+                          >
+                            <div 
+                              className="absolute inset-0 opacity-5 transition-opacity group-hover:opacity-10"
+                              style={{ backgroundColor: program.color || '#3b82f6' }}
+                            />
+                            
+                            <div className="relative z-10 space-y-3">
+                              <div className="flex justify-between items-center gap-2">
+                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${tMeta.color}`}>
+                                  <StructureIcon className="h-3 w-3" />
+                                  {tMeta.name}
+                                </span>
+                                {groupBy === 'audience' && (
+                                  <span className="text-xs font-semibold text-muted-foreground truncate max-w-[150px]" title={organizations.find(o => o.id === program.organizationId)?.name}>
+                                    {organizations.find(o => o.id === program.organizationId)?.name.replace(" Հիմնադրամ", "").replace(" (ԵՊՀ)", "").replace(" (UNDP)", "")}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <div className="space-y-1">
+                                <h3 className="font-bold text-lg leading-tight line-clamp-2 text-foreground group-hover:text-primary transition-colors">
+                                  {program.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                  {program.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="relative z-10 flex items-center text-xs font-semibold mt-4 text-muted-foreground group-hover:text-primary transition-all">
+                              Դիտել ծրագիրը
+                              <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Empty State */
+            <div className="flex flex-col items-center justify-center text-center p-16 rounded-3xl border border-dashed border-border bg-card/40 backdrop-blur-sm max-w-lg mx-auto space-y-6 animate-in fade-in duration-300">
+              <div className="h-16 w-16 rounded-full bg-accent/50 flex items-center justify-center text-muted-foreground">
+                <Search className="h-8 w-8" />
               </div>
-            ))}
-          </div>
-        ) : (
-          
-          /* Empty State */
-          <div className="flex flex-col items-center justify-center text-center p-16 rounded-3xl border border-dashed border-border bg-card/40 backdrop-blur-sm max-w-lg mx-auto space-y-6 animate-in fade-in duration-300">
-            <div className="h-16 w-16 rounded-full bg-accent/50 flex items-center justify-center text-muted-foreground">
-              <Search className="h-8 w-8" />
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold">Ոչինչ չի գտնվել</h3>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  Փորձեք փոխել որոնման բառերը կամ մաքրել ֆիլտրերը՝ ավելի շատ ուսումնական ծրագրեր տեսնելու համար։
+                </p>
+              </div>
+              <Button
+                onClick={handleResetFilters}
+                variant="default"
+                className="rounded-xl px-6"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Մաքրել ֆիլտրերը
+              </Button>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold">Ոչինչ չի գտնվել</h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Փորձեք փոխել որոնման բառերը կամ մաքրել ֆիլտրերը՝ ավելի շատ ուսումնական ծրագրեր տեսնելու համար։
-              </p>
-            </div>
-            <Button
-              onClick={handleResetFilters}
-              variant="default"
-              className="rounded-xl px-6"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Մաքրել ֆիլտրերը
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

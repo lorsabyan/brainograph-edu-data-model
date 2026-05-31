@@ -13,6 +13,7 @@ interface ColumnViewProps {
   onPlayClick: (id: string) => void;
   onEditClick: (id: string) => void;
   onAddNode?: () => void;
+  isEditMode: boolean;
 }
 
 export default function ColumnView({
@@ -21,7 +22,8 @@ export default function ColumnView({
   onNodeClick,
   onPlayClick,
   onEditClick,
-  onAddNode
+  onAddNode,
+  isEditMode
 }: ColumnViewProps) {
   
   // Build the path of selected nodes from root to currentNodeId
@@ -136,14 +138,16 @@ export default function ColumnView({
                           <span className="flex-1 text-sm truncate">{node.title}</span>
                           
                           <div className={`opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-muted-foreground shrink-0`}>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-6 w-6 mr-1"
-                              onClick={(e) => { e.stopPropagation(); onEditClick(node.id); }}
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
+                            {isEditMode && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 mr-1"
+                                onClick={(e) => { e.stopPropagation(); onEditClick(node.id); }}
+                              >
+                                <Edit className="h-3 w-3" />
+                              </Button>
+                            )}
                             {node.metadata?.isPlayable && (
                               <Button 
                                 variant="ghost" 

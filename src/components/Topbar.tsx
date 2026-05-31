@@ -14,6 +14,7 @@ interface TopbarProps {
   setViewMode: (mode: "grid" | "list" | "column") => void;
   onAddNode: () => void;
   virtualTree: ContentNode[]; // Needs to accept the virtual tree to calculate breadcrumbs properly
+  isEditMode: boolean;
 }
 
 export default function Topbar({
@@ -24,7 +25,8 @@ export default function Topbar({
   viewMode,
   setViewMode,
   onAddNode,
-  virtualTree
+  virtualTree,
+  isEditMode
 }: TopbarProps) {
   
   // Breadcrumb calculation using the virtual tree
@@ -105,10 +107,12 @@ export default function Topbar({
           </Button>
         </div>
 
-        <Button onClick={onAddNode} size="sm" className="rounded-full px-4 h-9 shadow-sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Նոր
-        </Button>
+        {isEditMode && (
+          <Button onClick={onAddNode} size="sm" className="rounded-full px-4 h-9 shadow-sm">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Նոր
+          </Button>
+        )}
       </div>
     </div>
   );

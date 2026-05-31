@@ -1,24 +1,34 @@
 "use client";
 
-import { Bookmark, Home, Trash2, Building2, Plus, ChevronsUpDown, Check } from "lucide-react";
+import { Bookmark, Home, Trash2, Building2, Plus, ChevronsUpDown, Check, GraduationCap, ShieldAlert, Edit3 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Organization } from "@/lib/data";
 import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface SidebarProps {
   onGoHome: () => void;
   currentNodeId: string | null;
   activeProgramId: string | null;
   onSelectProgram: (id: string | null) => void;
+  userRole: "learner" | "instructor";
+  onRoleChange: (role: "learner" | "instructor") => void;
+  isEditMode: boolean;
+  onEditModeChange: (edit: boolean) => void;
 }
 
 export default function Sidebar({ 
   onGoHome, 
   currentNodeId,
   activeProgramId,
-  onSelectProgram
+  onSelectProgram,
+  userRole,
+  onRoleChange,
+  isEditMode,
+  onEditModeChange
 }: SidebarProps) {
   return (
     <div className="w-64 bg-accent/20 border-r flex flex-col z-10 shrink-0">
@@ -78,16 +88,57 @@ export default function Sidebar({
         </div>
       </ScrollArea>
       
-      <div className="p-4 border-t border-border/50">
-        <div className="flex items-center px-2 py-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
-          <div className="h-8 w-8 rounded-full bg-muted border border-border/50 flex items-center justify-center mr-3 shrink-0 overflow-hidden">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aghasi" alt="User" className="h-full w-full object-cover" />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <h2 className="text-sm font-medium truncate leading-tight">Օգտատեր</h2>
-            <p className="text-xs text-muted-foreground truncate leading-tight mt-0.5">user@example.com</p>
+      <div className="p-4 border-t border-border/50 bg-background/30 space-y-4 shrink-0">
+        {/* Role Selector */}
+        <div className="space-y-1.5">
+          <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80">Օգտատիրոջ Դերը</Label>
+          <div className="grid grid-cols-2 gap-1 bg-muted p-0.5 rounded-lg border border-border/40">
+            <button
+              onClick={() => onRoleChange("learner")}
+              className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                userRole === "learner"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <GraduationCap className="h-3.5 w-3.5" />
+              Սովորող
+            </button>
+            <button
+              onClick={() => onRoleChange("instructor")}
+              className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                userRole === "instructor"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Ուսուցանող
+            </button>
           </div>
         </div>
+
+        {/* Edit Mode Toggle */}
+        {userRole === "instructor" ? (
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-accent/40 border border-border/50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="space-y-0.5">
+              <Label htmlFor="edit-mode-switch" className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <Edit3 className="h-3.5 w-3.5 text-primary" />
+                Խմբագրել
+              </Label>
+              <span className="text-[10px] text-muted-foreground block">Միացնել փոփոխությունները</span>
+            </div>
+            <Switch
+              id="edit-mode-switch"
+              checked={isEditMode}
+              onCheckedChange={onEditModeChange}
+            />
+          </div>
+        ) : (
+          <div className="p-2.5 rounded-lg bg-muted/40 border border-dashed border-border/40 text-center">
+            <span className="text-[10px] text-muted-foreground">Դիտման ռեժիմ (Սովորող)</span>
+          </div>
+        )}
       </div>
     </div>
   );
