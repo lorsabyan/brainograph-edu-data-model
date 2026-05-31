@@ -141,7 +141,7 @@ export default function ProgramBuilderModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Կառուցվածքի Կաղապար (Template)</Label>
+            <Label>Կառուցվածք (Template)</Label>
             <select
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}

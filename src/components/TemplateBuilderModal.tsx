@@ -64,7 +64,7 @@ export default function TemplateBuilderModal({ open, onClose, onSave }: Template
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[500px] max-h-[90dvh] flex flex-col p-0 gap-0 overflow-hidden rounded-2xl bg-background border-border shadow-xl">
         <DialogHeader className="px-6 py-4 border-b border-border/40 shrink-0">
-          <DialogTitle className="text-xl font-semibold">Ստեղծել Նոր Կաղապար</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Ստեղծել Նոր Կառուցվածք</DialogTitle>
           <DialogDescription>
             Նախագծեք ձեր կազմակերպության տվյալների հիերարխիան
           </DialogDescription>
@@ -72,7 +72,7 @@ export default function TemplateBuilderModal({ open, onClose, onSave }: Template
         
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
           <div className="space-y-2">
-            <Label>Կաղապարի Անվանում</Label>
+            <Label>Կառուցվածքի Անվանում</Label>
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Օր.՝ Մասնաճյուղեր..." className="h-10" />
           </div>
           

@@ -278,7 +278,7 @@ export default function PortalView({
               </Button>
               <Button onClick={onAddTemplate} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
                 <Plus className="h-4 w-4 text-muted-foreground" />
-                Նոր Կաղապար
+                Նոր Կառուցվածք
               </Button>
               <Button onClick={onAddProgram} className="rounded-2xl px-5 h-11 shadow-md gap-2 transition-all">
                 <Plus className="h-4 w-4 text-primary-foreground" />
