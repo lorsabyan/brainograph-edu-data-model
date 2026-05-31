@@ -34,6 +34,8 @@ interface PortalViewProps {
   onSelectLearnerGrade: (grade: string) => void;
   selectedInstructorGrades: string[];
   onSelectInstructorGrades: (grades: string[]) => void;
+  selectedInstructorSubjects: string[];
+  onSelectInstructorSubjects: (subjects: string[]) => void;
   activeTab: "discover" | "my-space";
   onChangeTab: (tab: "discover" | "my-space") => void;
   allNodes: any[]; // using any[] to avoid strict import type issues, but it maps to ContentNode[]
@@ -54,6 +56,8 @@ export default function PortalView({
   onSelectLearnerGrade,
   selectedInstructorGrades,
   onSelectInstructorGrades,
+  selectedInstructorSubjects,
+  onSelectInstructorSubjects,
   activeTab,
   onChangeTab,
   allNodes
@@ -69,6 +73,10 @@ export default function PortalView({
   useEffect(() => {
     setSelectedMySpaceSubject(null);
   }, [userRole, activeTab]);
+
+  const allAvailableSubjects = useMemo(() => {
+    return Array.from(new Set(programs.map(p => p.title))).sort();
+  }, [programs]);
 
   const LEVEL_GROUPS = useMemo(() => [
     { id: "school", name: "Դպրոցական", icon: GraduationCap, description: "Հանրակրթական հիմնական և օժանդակ դպրոցական առարկաներ" },
@@ -239,6 +247,11 @@ export default function PortalView({
       const isUniCourse = grade.includes("Կուրս");
       
       programs.forEach(program => {
+        // Filter by selected subjects
+        if (!selectedInstructorSubjects.includes(program.title)) {
+          return;
+        }
+
         const matchesLevel = 
           (isSchoolGrade && program.educationLevels?.includes("school")) ||
           (isUniCourse && program.educationLevels?.includes("university")) ||
@@ -279,7 +292,7 @@ export default function PortalView({
     });
     
     return cards;
-  }, [programs, allNodes, selectedInstructorGrades]);
+  }, [programs, allNodes, selectedInstructorGrades, selectedInstructorSubjects]);
 
   // Compute unique subject names available in current user's space cards
   const availableSubjects = useMemo(() => {
@@ -811,6 +824,41 @@ export default function PortalView({
                         }`}
                       >
                         {lvl}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Instructor Subjects Selector */}
+                <div className="space-y-1 pt-3.5 border-t border-border/10">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    Իմ Առարկաները
+                  </h3>
+                  <p className="text-xs text-muted-foreground">Նշեք այն առարկաները, որոնք դասավանդում եք՝ համապատասխան դասընթացների քարտերը տեսնելու համար։</p>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {allAvailableSubjects.map(sub => {
+                    const isSelected = selectedInstructorSubjects.includes(sub);
+                    return (
+                      <button
+                        key={sub}
+                        onClick={() => {
+                          if (isSelected) {
+                            if (selectedInstructorSubjects.length > 1) {
+                              onSelectInstructorSubjects(selectedInstructorSubjects.filter(x => x !== sub));
+                            }
+                          } else {
+                            onSelectInstructorSubjects([...selectedInstructorSubjects, sub]);
+                          }
+                        }}
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
+                            : "bg-background text-muted-foreground border-border hover:border-muted-foreground/40 hover:text-foreground"
+                        }`}
+                      >
+                        {sub}
                       </button>
                     );
                   })}

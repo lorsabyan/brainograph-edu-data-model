@@ -44,6 +44,7 @@ function WorkspacePortal() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedLearnerGrade, setSelectedLearnerGrade] = useState<string>("7-րդ դասարան");
   const [selectedInstructorGrades, setSelectedInstructorGrades] = useState<string[]>(["7-րդ դասարան", "8-րդ դասարան"]);
+  const [selectedInstructorSubjects, setSelectedInstructorSubjects] = useState<string[]>(["Հայոց պատմություն", "Աշխարհագրություն"]);
   const [activeTab, setActiveTab] = useState<"discover" | "my-space">("discover");
 
   const handleRoleChange = (role: "learner" | "instructor") => {
@@ -350,6 +351,8 @@ function WorkspacePortal() {
             onSelectLearnerGrade={setSelectedLearnerGrade}
             selectedInstructorGrades={selectedInstructorGrades}
             onSelectInstructorGrades={setSelectedInstructorGrades}
+            selectedInstructorSubjects={selectedInstructorSubjects}
+            onSelectInstructorSubjects={setSelectedInstructorSubjects}
             activeTab={activeTab}
             onChangeTab={setActiveTab}
             allNodes={allNodes}
