@@ -27,11 +27,15 @@ const PRESET_COLORS = [
   "#14b8a6", // Teal
 ];
 
-const AUDIENCES = [
-  { id: "դպրոցական", label: "Դպրոցական" },
-  { id: "դպրոցական հավելյալ", label: "Դպրոցական հավելյալ" },
-  { id: "բուհական", label: "Բուհական" },
-  { id: "մասնագիտական", label: "Մասնագիտական" }
+const LEVELS = [
+  { id: "school", label: "Դպրոցական" },
+  { id: "university", label: "Բուհական" },
+  { id: "public", label: "Հանրային" }
+];
+
+const STATUSES = [
+  { id: "state", label: "Պետական" },
+  { id: "supplementary", label: "Հավելյալ" }
 ];
 
 export default function ProgramBuilderModal({
@@ -47,7 +51,8 @@ export default function ProgramBuilderModal({
   const [orgId, setOrgId] = useState("");
   const [templateId, setTemplateId] = useState("");
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
-  const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [curriculum, setCurriculum] = useState("");
 
   // Sync state if editingProgram or organizations/templates change
@@ -58,7 +63,8 @@ export default function ProgramBuilderModal({
       setOrgId(editingProgram.organizationId);
       setTemplateId(editingProgram.templateId);
       setSelectedColor(editingProgram.color || PRESET_COLORS[0]);
-      setSelectedAudiences(editingProgram.targetAudience || []);
+      setSelectedLevels(editingProgram.educationLevels || []);
+      setSelectedStatuses(editingProgram.programStatuses || []);
       setCurriculum(editingProgram.curriculum || "");
     } else {
       setTitle("");
@@ -66,7 +72,8 @@ export default function ProgramBuilderModal({
       setOrgId(organizations[0]?.id || "");
       setTemplateId(templates[0]?.id || "");
       setSelectedColor(PRESET_COLORS[0]);
-      setSelectedAudiences([]);
+      setSelectedLevels([]);
+      setSelectedStatuses([]);
       setCurriculum("");
     }
   }, [editingProgram, open, organizations, templates]);
@@ -79,7 +86,8 @@ export default function ProgramBuilderModal({
       title,
       description,
       color: selectedColor,
-      targetAudience: selectedAudiences,
+      educationLevels: selectedLevels,
+      programStatuses: selectedStatuses,
       curriculum: curriculum.trim() || undefined
     };
     onSave(newProgram);
@@ -100,7 +108,7 @@ export default function ProgramBuilderModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+        <div className="p-6 space-y-5 overflow-y-auto flex-1 text-left">
           <div className="space-y-2">
             <Label>Առարկայի Անվանում</Label>
             <Input
@@ -164,28 +172,57 @@ export default function ProgramBuilderModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Թիրախային Լսարան (Target Audience)</Label>
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              {AUDIENCES.map((aud) => {
-                const checked = selectedAudiences.includes(aud.id);
+            <Label>Կրթական Մակարդակ (Educational Level)</Label>
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              {LEVELS.map((lvl) => {
+                const checked = selectedLevels.includes(lvl.id);
                 return (
                   <label
-                    key={aud.id}
-                    className="flex items-center space-x-2 text-sm select-none cursor-pointer border border-border/60 hover:border-border rounded-lg p-2 transition-colors bg-card hover:bg-accent/10"
+                    key={lvl.id}
+                    className="flex items-center space-x-2 text-[11px] select-none cursor-pointer border border-border/60 hover:border-border rounded-lg p-2 transition-colors bg-card hover:bg-accent/10"
                   >
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
                         if (checked) {
-                          setSelectedAudiences(selectedAudiences.filter(id => id !== aud.id));
+                          setSelectedLevels(selectedLevels.filter(id => id !== lvl.id));
                         } else {
-                          setSelectedAudiences([...selectedAudiences, aud.id]);
+                          setSelectedLevels([...selectedLevels, lvl.id]);
                         }
                       }}
                       className="rounded border-input text-primary focus:ring-primary h-4 w-4"
                     />
-                    <span className="text-foreground/90 font-medium">{aud.label}</span>
+                    <span className="text-foreground/90 font-medium">{lvl.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Կարգավիճակ (Program Status)</Label>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {STATUSES.map((st) => {
+                const checked = selectedStatuses.includes(st.id);
+                return (
+                  <label
+                    key={st.id}
+                    className="flex items-center space-x-2 text-[11px] select-none cursor-pointer border border-border/60 hover:border-border rounded-lg p-2 transition-colors bg-card hover:bg-accent/10"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        if (checked) {
+                          setSelectedStatuses(selectedStatuses.filter(id => id !== st.id));
+                        } else {
+                          setSelectedStatuses([...selectedStatuses, st.id]);
+                        }
+                      }}
+                      className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                    />
+                    <span className="text-foreground/90 font-medium">{st.label}</span>
                   </label>
                 );
               })}
@@ -213,7 +250,7 @@ export default function ProgramBuilderModal({
         <DialogFooter className="m-0 px-6 py-4 border-t border-border/40 bg-muted/10 shrink-0">
           <Button variant="ghost" onClick={onClose} className="h-9 px-4 text-sm">Չեղարկել</Button>
           <Button onClick={handleSave} disabled={!isFormValid} className="h-9 px-8 font-medium text-sm">
-            Ստեղծել
+            {editingProgram ? "Պահպանել" : "Ստեղծել"}
           </Button>
         </DialogFooter>
       </DialogContent>

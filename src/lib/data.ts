@@ -29,7 +29,8 @@ export interface Program {
   templateId: string;
   color?: string;
   imageUrl?: string;
-  targetAudience?: string[];
+  educationLevels?: string[];
+  programStatuses?: string[];
   curriculum?: string;
 }
 
@@ -145,7 +146,8 @@ export const initialPrograms: Program[] = [
       organizationId: 'org_vaf',
       templateId: subj === 'Նախագծային աշխատանք' || subj === 'Սիմֆոնիկ ԴասA' || subj === 'Կլիմայական արկղիկ' ? 'tpl_freeform' : 'tpl_subject',
       color: colors[index],
-      targetAudience: isSupplementary ? ['դպրոցական հավելյալ'] : ['դպրոցական'],
+      educationLevels: ['school'],
+      programStatuses: isSupplementary ? ['supplementary'] : ['state'],
       curriculum: 'Աշխարհացույց'
     };
   }),
@@ -156,7 +158,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
     color: '#f97316',
-    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ'],
+    educationLevels: ['school'],
+    programStatuses: ['state', 'supplementary'],
     curriculum: 'Արարատյան բակալավրիատ'
   },
   {
@@ -166,7 +169,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
     color: '#ef4444',
-    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ'],
+    educationLevels: ['school'],
+    programStatuses: ['state', 'supplementary'],
     curriculum: 'Արարատյան բակալավրիատ'
   },
   {
@@ -176,7 +180,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_ysu',
     templateId: 'tpl_university',
     color: '#0284c7',
-    targetAudience: ['բուհական']
+    educationLevels: ['university'],
+    programStatuses: ['state']
   },
   {
     id: 'prog_ysu_2',
@@ -185,7 +190,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_ysu',
     templateId: 'tpl_university',
     color: '#4338ca',
-    targetAudience: ['բուհական']
+    educationLevels: ['university'],
+    programStatuses: ['state']
   },
   {
     id: 'prog_undp_1',
@@ -194,7 +200,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_undp',
     templateId: 'tpl_course',
     color: '#059669',
-    targetAudience: ['մասնագիտական']
+    educationLevels: ['public'],
+    programStatuses: ['supplementary']
   },
   {
     id: 'prog_cba_1',
@@ -203,7 +210,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_cba',
     templateId: 'tpl_course',
     color: '#16a34a',
-    targetAudience: ['դպրոցական', 'մասնագիտական']
+    educationLevels: ['school', 'public'],
+    programStatuses: ['supplementary']
   },
   {
     id: 'prog_museum_1',
@@ -212,7 +220,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_museum',
     templateId: 'tpl_museum',
     color: '#9ca3af',
-    targetAudience: ['դպրոցական հավելյալ', 'մասնագիտական']
+    educationLevels: ['public'],
+    programStatuses: ['supplementary']
   },
   {
     id: 'prog_polytech_1',
@@ -221,7 +230,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_polytech',
     templateId: 'tpl_university',
     color: '#dc2626',
-    targetAudience: ['բուհական']
+    educationLevels: ['university'],
+    programStatuses: ['supplementary']
   },
   {
     id: 'prog_ind_1',
@@ -230,7 +240,8 @@ export const initialPrograms: Program[] = [
     organizationId: 'org_ind',
     templateId: 'tpl_course',
     color: '#db2777',
-    targetAudience: ['մասնագիտական']
+    educationLevels: ['public'],
+    programStatuses: ['supplementary']
   }
 ];
 

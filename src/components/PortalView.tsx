@@ -1,25 +1,23 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Program, Organization, initialTemplates } from "@/lib/data";
+import { Program, Organization } from "@/lib/data";
 import { 
   Building2, 
   ArrowRight, 
   Search, 
   X, 
-  Filter, 
   GraduationCap, 
   BookOpen, 
-  Map, 
-  Layout, 
-  FolderHeart,
-  RotateCcw,
   Plus,
-  Edit3
+  Edit3,
+  Users,
+  ShieldCheck,
+  Sparkles,
+  RotateCcw
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface PortalViewProps {
   programs: Program[];
@@ -46,24 +44,20 @@ export default function PortalView({
 }: PortalViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-  const [selectedAudience, setSelectedAudience] = useState<string | null>(null);
-  const [groupBy, setGroupBy] = useState<'org' | 'audience'>('org');
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<'org' | 'level'>('org');
 
-  const AUDIENCE_GROUPS = useMemo(() => [
-    { id: "դպրոցական", name: "Դպրոցական", icon: GraduationCap, description: "Հանրակրթական հիմնական առարկաներ և դասարաններ" },
-    { id: "դպրոցական հավելյալ", name: "Դպրոցական հավելյալ", icon: FolderHeart, description: "Արտադասարանական, նախագծային և օժանդակ նյութեր" },
-    { id: "բուհական", name: "Բուհական", icon: BookOpen, description: "Բարձրագույն ուսումնական հաստատությունների ծրագրեր" },
-    { id: "մասնագիտական", name: "Մասնագիտական", icon: Layout, description: "Մասնագիտական վերապատրաստումներ և հատուկ դասընթացներ" }
+  const LEVEL_GROUPS = useMemo(() => [
+    { id: "school", name: "Դպրոցական", icon: GraduationCap, description: "Հանրակրթական հիմնական և օժանդակ դպրոցական առարկաներ" },
+    { id: "university", name: "Բուհական", icon: BookOpen, description: "Բարձրագույն ուսումնական հաստատությունների դասընթացներ" },
+    { id: "public", name: "Հանրային / Ոչ ֆորմալ", icon: Users, description: "Հանրության ինքնակրթության և ոչ ֆորմալ ուսուցման նյութեր" }
   ], []);
 
-  // Template helper names and icons in Armenian
-  const templateMetadata = {
-    tpl_subject: { name: "Դպրոցական", icon: GraduationCap, color: "text-blue-500 bg-blue-500/10 border-blue-500/20" },
-    tpl_university: { name: "Բուհական", icon: BookOpen, color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20" },
-    tpl_museum: { name: "Թանգարանային", icon: Map, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
-    tpl_course: { name: "Մասնագիտական", icon: Layout, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
-    tpl_freeform: { name: "Ազատ կառուցվածք", icon: FolderHeart, color: "text-pink-500 bg-pink-500/10 border-pink-500/20" },
-  };
+  const STATUS_GROUPS = useMemo(() => [
+    { id: "state", name: "Պետական / Պարտադիր", icon: ShieldCheck, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
+    { id: "supplementary", name: "Հավելյալ / Օպցիոնալ", icon: Sparkles, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" }
+  ], []);
 
   // Filter programs based on criteria
   const filteredPrograms = useMemo(() => {
@@ -86,16 +80,23 @@ export default function PortalView({
         return false;
       }
 
-      // 3. Target Audience Filter
-      if (selectedAudience) {
-        if (!program.targetAudience || !program.targetAudience.includes(selectedAudience)) {
+      // 3. Educational Level Filter
+      if (selectedLevel) {
+        if (!program.educationLevels || !program.educationLevels.includes(selectedLevel)) {
+          return false;
+        }
+      }
+
+      // 4. Program Status Filter
+      if (selectedStatus) {
+        if (!program.programStatuses || !program.programStatuses.includes(selectedStatus)) {
           return false;
         }
       }
 
       return true;
     });
-  }, [programs, organizations, searchQuery, selectedOrgId, selectedAudience]);
+  }, [programs, organizations, searchQuery, selectedOrgId, selectedLevel, selectedStatus]);
 
   // Group filtered programs by organization
   const programsByOrg = useMemo(() => {
@@ -107,13 +108,13 @@ export default function PortalView({
       .filter(org => org.programs.length > 0);
   }, [organizations, filteredPrograms]);
 
-  // Group filtered programs by target audience
-  const programsByAudience = useMemo(() => {
-    return AUDIENCE_GROUPS.map(group => ({
+  // Group filtered programs by educational level
+  const programsByLevel = useMemo(() => {
+    return LEVEL_GROUPS.map(group => ({
       ...group,
-      programs: filteredPrograms.filter(p => p.targetAudience?.includes(group.id))
+      programs: filteredPrograms.filter(p => p.educationLevels?.includes(group.id))
     })).filter(g => g.programs.length > 0);
-  }, [filteredPrograms, AUDIENCE_GROUPS]);
+  }, [filteredPrograms, LEVEL_GROUPS]);
 
   // Combined grouped results based on groupBy setting
   const groups = useMemo(() => {
@@ -126,20 +127,21 @@ export default function PortalView({
         programs: org.programs
       }));
     } else {
-      return programsByAudience.map(aud => ({
-        id: aud.id,
-        title: aud.name,
-        subtitle: aud.description,
-        icon: aud.icon,
-        programs: aud.programs
+      return programsByLevel.map(lvl => ({
+        id: lvl.id,
+        title: lvl.name,
+        subtitle: lvl.description,
+        icon: lvl.icon,
+        programs: lvl.programs
       }));
     }
-  }, [groupBy, programsByOrg, programsByAudience]);
+  }, [groupBy, programsByOrg, programsByLevel]);
 
   const handleResetFilters = () => {
     setSearchQuery("");
     setSelectedOrgId(null);
-    setSelectedAudience(null);
+    setSelectedLevel(null);
+    setSelectedStatus(null);
   };
 
   return (
@@ -147,8 +149,8 @@ export default function PortalView({
       <div className="max-w-6xl mx-auto space-y-10">
         
         {/* Hero Section */}
-        <div className="border-b border-border/40 pb-6 shrink-0">
-          <div className="space-y-3 text-center md:text-left">
+        <div className="border-b border-border/40 pb-6 shrink-0 text-left">
+          <div className="space-y-3">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-violet-600 dark:from-primary dark:via-blue-400 dark:to-indigo-300">
               Բացահայտեք Ուսումնական Առարկաներ
             </h1>
@@ -185,7 +187,7 @@ export default function PortalView({
             </div>
 
             {/* Reset Filters Quick Button */}
-            {(searchQuery || selectedOrgId || selectedAudience) && (
+            {(searchQuery || selectedOrgId || selectedLevel || selectedStatus) && (
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
@@ -197,45 +199,80 @@ export default function PortalView({
             )}
           </div>
 
-          <div className="space-y-4 border-t border-border/40 pt-4">
+          <div className="space-y-4 border-t border-border/40 pt-4 text-left">
 
-            {/* Target Audience Filter */}
+            {/* Educational Level Filter */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
                 <GraduationCap className="h-3 w-3" />
-                Լսարան՝
+                Մակարդակ՝
               </span>
               <button
-                onClick={() => setSelectedAudience(null)}
+                onClick={() => setSelectedLevel(null)}
                 className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border ${
-                  selectedAudience === null
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
+                  selectedLevel === null
+                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                     : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
                 }`}
               >
                 Բոլորը
               </button>
-              {AUDIENCE_GROUPS.map(aud => {
-                const IconComponent = aud.icon;
+              {LEVEL_GROUPS.map(lvl => {
+                const IconComponent = lvl.icon;
                 return (
                   <button
-                    key={aud.id}
-                    onClick={() => setSelectedAudience(aud.id)}
+                    key={lvl.id}
+                    onClick={() => setSelectedLevel(lvl.id)}
                     className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border flex items-center gap-1.5 ${
-                      selectedAudience === aud.id
-                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                        : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
+                      selectedLevel === lvl.id
+                         ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                         : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
                     }`}
                   >
                     <IconComponent className="h-3.5 w-3.5" />
-                    {aud.name}
+                    {lvl.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Program Status Filter */}
+            <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/10">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
+                <ShieldCheck className="h-3 w-3" />
+                Կարգավիճակ՝
+              </span>
+              <button
+                onClick={() => setSelectedStatus(null)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border ${
+                  selectedStatus === null
+                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                     : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
+                }`}
+              >
+                Բոլորը
+              </button>
+              {STATUS_GROUPS.map(st => {
+                const IconComponent = st.icon;
+                return (
+                  <button
+                    key={st.id}
+                    onClick={() => setSelectedStatus(st.id)}
+                    className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border flex items-center gap-1.5 ${
+                      selectedStatus === st.id
+                         ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                         : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <IconComponent className="h-3.5 w-3.5" />
+                    {st.name}
                   </button>
                 );
               })}
             </div>
 
             {/* Organization Filter */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/10">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
                 <Building2 className="h-3 w-3" />
                 Հաստատություն՝
@@ -251,10 +288,10 @@ export default function PortalView({
                 Բոլորը
               </button>
               {organizations.map(org => {
-                // Only show orgs that have matching programs after filtering by audience
                 const hasMatchingPrograms = programs.some(
                   p => p.organizationId === org.id && 
-                       (!selectedAudience || p.targetAudience?.includes(selectedAudience))
+                       (!selectedLevel || p.educationLevels?.includes(selectedLevel)) &&
+                       (!selectedStatus || p.programStatuses?.includes(selectedStatus))
                 );
                 if (!hasMatchingPrograms) return null;
 
@@ -297,7 +334,7 @@ export default function PortalView({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
             <h2 className="text-xl font-bold text-foreground/80 flex items-center gap-2">
-              {groupBy === 'org' ? 'Առարկաներն ըստ Հաստատությունների' : 'Առարկաներն ըստ Թիրախային Լսարանի'}
+              {groupBy === 'org' ? 'Առարկաներն ըստ Հաստատությունների' : 'Առարկաներն ըստ Կրթական Մակարդակների'}
             </h2>
             <div className="flex items-center gap-1.5 bg-muted/50 p-1 rounded-xl border border-border/40 w-fit self-end sm:self-auto shrink-0">
               <button
@@ -311,14 +348,14 @@ export default function PortalView({
                 Ըստ Հաստատությունների
               </button>
               <button
-                onClick={() => setGroupBy('audience')}
+                onClick={() => setGroupBy('level')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  groupBy === 'audience'
+                  groupBy === 'level'
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Ըստ Թիրախային Լսարանի
+                Ըստ Կրթական Մակարդակների
               </button>
             </div>
           </div>
@@ -329,7 +366,7 @@ export default function PortalView({
                 const GroupIcon = group.icon;
                 return (
                   <div key={group.id} className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300">
-                    <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                    <div className="flex items-center justify-between border-b border-border/50 pb-4 text-left">
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 rounded-xl bg-accent/70 flex items-center justify-center shrink-0 border border-border/40">
                           <GroupIcon className="h-5 w-5 text-muted-foreground" />
@@ -355,15 +392,8 @@ export default function PortalView({
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                       {group.programs.map(program => {
-                        const tMeta = templateMetadata[program.templateId as keyof typeof templateMetadata] || {
-                          name: "Այլ",
-                          icon: GraduationCap,
-                          color: "text-muted-foreground bg-muted border-border/50"
-                        };
-                        const StructureIcon = tMeta.icon;
-
                         return (
                           <div 
                             key={program.id}
@@ -376,39 +406,51 @@ export default function PortalView({
                             />
                             
                             <div className="relative z-10 space-y-3">
-                              <div className="flex justify-between items-center gap-2">
+                              <div className="flex justify-between items-start gap-2">
+                                {/* Level Badges (Left) */}
                                 <div className="flex flex-wrap gap-1 min-w-0">
-                                  {program.targetAudience && program.targetAudience.length > 0 ? (
-                                    program.targetAudience.map(audId => {
-                                      const audGroup = AUDIENCE_GROUPS.find(g => g.id === audId);
-                                      if (!audGroup) return null;
-                                      const AudIcon = audGroup.icon;
+                                  {program.educationLevels && program.educationLevels.length > 0 ? (
+                                    program.educationLevels.map(lvlId => {
+                                      const lvlGroup = LEVEL_GROUPS.find(g => g.id === lvlId);
+                                      if (!lvlGroup) return null;
+                                      const LevelIcon = lvlGroup.icon;
                                       
                                       let colorClass = "text-blue-500 bg-blue-500/10 border-blue-500/20";
-                                      if (audId === "դպրոցական հավելյալ") {
-                                        colorClass = "text-pink-500 bg-pink-500/10 border-pink-500/20";
-                                      } else if (audId === "բուհական") {
-                                        colorClass = "text-indigo-500 bg-indigo-500/10 border-indigo-500/20";
-                                      } else if (audId === "մասնագիտական") {
+                                      if (lvlId === "university") {
+                                        colorClass = "text-violet-500 bg-violet-500/10 border-violet-500/20";
+                                      } else if (lvlId === "public") {
                                         colorClass = "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
                                       }
 
                                       return (
-                                        <span key={audId} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${colorClass}`}>
-                                          <AudIcon className="h-2.5 w-2.5" />
-                                          {audGroup.name}
+                                        <span key={lvlId} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${colorClass}`}>
+                                          <LevelIcon className="h-2.5 w-2.5" />
+                                          {lvlGroup.name.split(" / ")[0]}
                                         </span>
                                       );
                                     })
                                   ) : (
                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border text-muted-foreground bg-muted border-border/50 shrink-0">
-                                      Լսարան չկա
+                                      Մակարդակ չկա
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1.5 min-w-0">
-                                  {groupBy === 'audience' && (
-                                    <span className="text-xs font-semibold text-muted-foreground truncate max-w-[120px]" title={organizations.find(o => o.id === program.organizationId)?.name}>
+                                
+                                {/* Status Badges (Right) & Edit Action */}
+                                <div className="flex items-center gap-1.5 min-w-0 flex-wrap justify-end">
+                                  {program.programStatuses && program.programStatuses.map(stId => {
+                                    const stGroup = STATUS_GROUPS.find(g => g.id === stId);
+                                    if (!stGroup) return null;
+                                    const StatusIcon = stGroup.icon;
+                                    return (
+                                      <span key={stId} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${stGroup.color}`} title={stGroup.name}>
+                                        <StatusIcon className="h-2.5 w-2.5" />
+                                        {stGroup.name.split(" / ")[0]}
+                                      </span>
+                                    );
+                                  })}
+                                  {groupBy === 'level' && (
+                                    <span className="text-xs font-semibold text-muted-foreground truncate max-w-[120px] ml-1" title={organizations.find(o => o.id === program.organizationId)?.name}>
                                       {organizations.find(o => o.id === program.organizationId)?.name.replace(" Հիմնադրամ", "").replace(" (ԵՊՀ)", "").replace(" (UNDP)", "")}
                                     </span>
                                   )}
@@ -416,7 +458,7 @@ export default function PortalView({
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md z-20 shrink-0"
+                                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md z-20 shrink-0 ml-1"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         onEditProgram?.(program.id);
