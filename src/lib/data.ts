@@ -30,6 +30,7 @@ export interface Program {
   color?: string;
   imageUrl?: string;
   targetAudience?: string[];
+  curriculum?: string;
 }
 
 export interface ContentNode {
@@ -53,8 +54,8 @@ export interface ContentNode {
 }
 
 export const initialOrganizations: Organization[] = [
-  { id: 'org_vaf', name: 'Աշխարհացույց / Վիզուալ Հայաստան', defaultTemplateId: 'tpl_subject' },
-  { id: 'org_ayb', name: 'Այբ Հիմնադրամ', defaultTemplateId: 'tpl_subject' },
+  { id: 'org_vaf', name: '«Վիզուալ Հայաստան» հիմնադրամ', defaultTemplateId: 'tpl_subject' },
+  { id: 'org_ayb', name: '«Այբ» կրթական հիմնադրամ', defaultTemplateId: 'tpl_subject' },
   { id: 'org_ysu', name: 'Երևանի Պետական Համալսարան (ԵՊՀ)', defaultTemplateId: 'tpl_university' },
   { id: 'org_undp', name: 'ՄԱԿ-ի զարգացման ծրագիր (UNDP)', defaultTemplateId: 'tpl_course' },
   { id: 'org_cba', name: 'ՀՀ Կենտրոնական Բանկ', defaultTemplateId: 'tpl_course' },
@@ -144,26 +145,29 @@ export const initialPrograms: Program[] = [
       organizationId: 'org_vaf',
       templateId: subj === 'Նախագծային աշխատանք' || subj === 'Սիմֆոնիկ ԴասA' || subj === 'Կլիմայական արկղիկ' ? 'tpl_freeform' : 'tpl_subject',
       color: colors[index],
-      targetAudience: isSupplementary ? ['դպրոցական հավելյալ'] : ['դպրոցական']
+      targetAudience: isSupplementary ? ['դպրոցական հավելյալ'] : ['դպրոցական'],
+      curriculum: 'Աշխարհացույց'
     };
   }),
   {
     id: 'prog_ayb_1',
-    title: 'Արարատյան Բակալավրիատ. Մաթեմատիկա',
+    title: 'Մաթեմատիկա',
     description: 'Այբ կրթական հիմնադրամի մաթեմատիկայի ծրագիր',
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
     color: '#f97316',
-    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ']
+    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ'],
+    curriculum: 'Արարատյան բակալավրիատ'
   },
   {
     id: 'prog_ayb_2',
-    title: 'Արարատյան Բակալավրիատ. Ֆիզիկա',
+    title: 'Ֆիզիկա',
     description: 'Այբ կրթական հիմնադրամի ֆիզիկայի ծրագիր',
     organizationId: 'org_ayb',
     templateId: 'tpl_subject',
     color: '#ef4444',
-    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ']
+    targetAudience: ['դպրոցական', 'դպրոցական հավելյալ'],
+    curriculum: 'Արարատյան բակալավրիատ'
   },
   {
     id: 'prog_ysu_1',

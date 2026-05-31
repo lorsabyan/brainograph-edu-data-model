@@ -366,7 +366,12 @@ export default function PortalView({
                                 )}
                               </div>
                               
-                              <div className="space-y-1">
+                              <div className="space-y-1.5">
+                                {program.curriculum && (
+                                  <div className="text-[10px] font-extrabold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded w-fit">
+                                    {program.curriculum}
+                                  </div>
+                                )}
                                 <h3 className="font-bold text-lg leading-tight line-clamp-2 text-foreground group-hover:text-primary transition-colors">
                                   {program.title}
                                 </h3>

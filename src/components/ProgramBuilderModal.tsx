@@ -46,6 +46,7 @@ export default function ProgramBuilderModal({
   const [templateId, setTemplateId] = useState(templates[0]?.id || "");
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
   const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
+  const [curriculum, setCurriculum] = useState("");
 
   // Sync state if organizations or templates change
   React.useEffect(() => {
@@ -68,7 +69,8 @@ export default function ProgramBuilderModal({
       title,
       description,
       color: selectedColor,
-      targetAudience: selectedAudiences
+      targetAudience: selectedAudiences,
+      curriculum: curriculum.trim() || undefined
     };
     onSave(newProgram);
     onClose();
@@ -76,6 +78,7 @@ export default function ProgramBuilderModal({
     setTitle("");
     setDescription("");
     setSelectedAudiences([]);
+    setCurriculum("");
   };
 
   const isFormValid = title.trim() !== "" && orgId !== "" && templateId !== "";
@@ -108,6 +111,16 @@ export default function ProgramBuilderModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Օր.՝ Դպրոցական դասընթացների ամբողջական ծրագիր..."
+              className="h-10"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Կրթական Ծրագիր / Curriculum (Օպցիոնալ)</Label>
+            <Input
+              value={curriculum}
+              onChange={(e) => setCurriculum(e.target.value)}
+              placeholder="Օր.՝ Աշխարհացույց, Արարատյան բակալավրիատ..."
               className="h-10"
             />
           </div>
