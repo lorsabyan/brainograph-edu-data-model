@@ -87,15 +87,15 @@ export default function ProgramBuilderModal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[450px] flex flex-col p-0 gap-0 overflow-hidden rounded-2xl bg-background border-border shadow-xl">
         <DialogHeader className="px-6 py-4 border-b border-border/40 shrink-0">
-          <DialogTitle className="text-xl font-semibold">Ստեղծել Ուսումնական Ծրագիր</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Ստեղծել Ուսումնական Առարկա</DialogTitle>
           <DialogDescription>
-            Ավելացրեք նոր ուսումնական ծրագիր ձեր հաստատության համար։
+            Ավելացրեք նոր ուսումնական առարկա ձեր հաստատության համար։
           </DialogDescription>
         </DialogHeader>
 
         <div className="p-6 space-y-5 overflow-y-auto flex-1">
           <div className="space-y-2">
-            <Label>Ծրագրի Անվանում</Label>
+            <Label>Առարկայի Անվանում</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -110,7 +110,7 @@ export default function ProgramBuilderModal({
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Օր.՝ Դպրոցական դասընթացների ամբողջական ծրագիր..."
+              placeholder="Օր.՝ Դպրոցական դասընթացների ամբողջական առարկայացանկ..."
               className="h-10"
             />
           </div>

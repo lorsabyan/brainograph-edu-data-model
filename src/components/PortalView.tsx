@@ -116,7 +116,7 @@ export default function PortalView({
       return programsByOrg.map(org => ({
         id: org.id,
         title: org.name,
-        subtitle: `Առաջարկում է ${org.programs.length} ծրագիր`,
+        subtitle: `Առաջարկում է ${org.programs.length} առարկա`,
         icon: Building2,
         programs: org.programs
       }));
@@ -145,7 +145,7 @@ export default function PortalView({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-6 shrink-0">
           <div className="space-y-3 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-violet-600 dark:from-primary dark:via-blue-400 dark:to-indigo-300">
-              Բացահայտեք Ուսումնական Ծրագրեր
+              Բացահայտեք Ուսումնական Առարկաներ
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
               Գտեք լավագույն կրթական նյութերը, դասընթացները և պլանները՝ ստեղծված առաջատար հաստատությունների կողմից։
@@ -163,7 +163,7 @@ export default function PortalView({
               </Button>
               <Button onClick={onAddProgram} className="rounded-2xl px-5 h-11 shadow-md gap-2 transition-all">
                 <Plus className="h-4 w-4 text-primary-foreground" />
-                Նոր Ծրագիր
+                Նոր Առարկա
               </Button>
             </div>
           )}
@@ -179,7 +179,7 @@ export default function PortalView({
               <Input
                 id="portal-search-input"
                 name="searchQuery"
-                aria-label="Որոնել ուսումնական ծրագրեր"
+                aria-label="Որոնել ուսումնական առարկաներ"
                 placeholder="Որոնել ըստ վերնագրի, նկարագրության կամ հաստատության..."
                 className="pl-10 pr-10 py-5 bg-background border-border/60 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all rounded-2xl h-12 text-base shadow-inner w-full"
                 value={searchQuery}
@@ -291,7 +291,7 @@ export default function PortalView({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
             <h2 className="text-xl font-bold text-foreground/80 flex items-center gap-2">
-              {groupBy === 'org' ? 'Ծրագրերն ըստ Հաստատությունների' : 'Ծրագրերն ըստ Թիրախային Լսարանի'}
+              {groupBy === 'org' ? 'Առարկաներն ըստ Հաստատությունների' : 'Առարկաներն ըստ Թիրախային Լսարանի'}
             </h2>
             <div className="flex items-center gap-1.5 bg-muted/50 p-1 rounded-xl border border-border/40 w-fit self-end sm:self-auto shrink-0">
               <button
@@ -382,7 +382,7 @@ export default function PortalView({
                             </div>
 
                             <div className="relative z-10 flex items-center text-xs font-semibold mt-4 text-muted-foreground group-hover:text-primary transition-all">
-                              Դիտել ծրագիրը
+                              Դիտել առարկան
                               <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                             </div>
                           </div>
@@ -402,7 +402,7 @@ export default function PortalView({
               <div className="space-y-2">
                 <h3 className="text-xl font-bold">Ոչինչ չի գտնվել</h3>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  Փորձեք փոխել որոնման բառերը կամ մաքրել ֆիլտրերը՝ ավելի շատ ուսումնական ծրագրեր տեսնելու համար։
+                  Փորձեք փոխել որոնման բառերը կամ մաքրել ֆիլտրերը՝ ավելի շատ ուսումնական առարկաներ տեսնելու համար։
                 </p>
               </div>
               <Button

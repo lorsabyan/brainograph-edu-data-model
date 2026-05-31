@@ -50,12 +50,12 @@ export default function Sidebar({
               onClick={() => onSelectProgram(null)}
             >
               <Building2 className="mr-3 h-4 w-4" />
-              Բացահայտել Ծրագրեր
+              Բացահայտել Առարկաներ
             </Button>
             
             <Button variant="ghost" className="w-full justify-start h-9 px-3 text-muted-foreground hover:text-foreground opacity-60">
               <Bookmark className="mr-3 h-4 w-4" />
-              Իմ Ծրագրերը
+              Իմ Առարկաները
             </Button>
           </div>
 
