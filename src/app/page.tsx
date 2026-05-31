@@ -11,6 +11,7 @@ import SlideshowModal from "@/components/SlideshowModal";
 import FolderModal from "@/components/FolderModal";
 import TemplateBuilderModal from "@/components/TemplateBuilderModal";
 import OrganizationBuilderModal from "@/components/OrganizationBuilderModal";
+import ProgramBuilderModal from "@/components/ProgramBuilderModal";
 import PortalView from "@/components/PortalView";
 import { initialNodes, ContentNode, initialTemplates, HierarchyTemplate, initialOrganizations, Organization, initialPrograms, Program } from "@/lib/data";
 import { useVirtualTree, HierarchyView } from "@/hooks/useVirtualTree";
@@ -44,6 +45,7 @@ function WorkspacePortal() {
   const [isAddingShortcut, setIsAddingShortcut] = useState(false);
   const [isBuildingTemplate, setIsBuildingTemplate] = useState(false);
   const [isBuildingOrg, setIsBuildingOrg] = useState(false);
+  const [isBuildingProgram, setIsBuildingProgram] = useState(false);
 
   const activeProgram = programs.find(p => p.id === activeProgramId) || null;
   const [activeTemplateId, setActiveTemplateId] = useState<string>(initialTemplates[0].id);
@@ -275,6 +277,10 @@ function WorkspacePortal() {
     handleGoHome();
   };
 
+  const handleSaveProgram = (newProgram: Program) => {
+    setPrograms(prev => [...prev, newProgram]);
+  };
+
   const shortcutsOnly = virtualTree.filter(n => n.type === 'shortcut');
 
   return (
@@ -292,6 +298,9 @@ function WorkspacePortal() {
             programs={programs} 
             organizations={organizations} 
             onSelectProgram={handleSelectProgram} 
+            onAddOrg={() => setIsBuildingOrg(true)}
+            onAddProgram={() => setIsBuildingProgram(true)}
+            onAddTemplate={() => setIsBuildingTemplate(true)}
           />
         ) : (
           <>
@@ -372,6 +381,14 @@ function WorkspacePortal() {
         open={isBuildingOrg}
         onClose={() => setIsBuildingOrg(false)}
         onSave={handleSaveOrg}
+      />
+
+      <ProgramBuilderModal 
+        open={isBuildingProgram}
+        onClose={() => setIsBuildingProgram(false)}
+        onSave={handleSaveProgram}
+        organizations={organizations}
+        templates={templates}
       />
     </div>
   );

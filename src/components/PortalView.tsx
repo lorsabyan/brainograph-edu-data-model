@@ -13,7 +13,8 @@ import {
   Map, 
   Layout, 
   FolderHeart,
-  RotateCcw
+  RotateCcw,
+  Plus
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,9 +24,19 @@ interface PortalViewProps {
   programs: Program[];
   organizations: Organization[];
   onSelectProgram: (programId: string) => void;
+  onAddOrg: () => void;
+  onAddProgram: () => void;
+  onAddTemplate: () => void;
 }
 
-export default function PortalView({ programs, organizations, onSelectProgram }: PortalViewProps) {
+export default function PortalView({ 
+  programs, 
+  organizations, 
+  onSelectProgram,
+  onAddOrg,
+  onAddProgram,
+  onAddTemplate
+}: PortalViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
@@ -95,14 +106,30 @@ export default function PortalView({ programs, organizations, onSelectProgram }:
     <div className="flex-1 overflow-auto bg-background p-6 md:p-10 transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-10">
         
-        {/* Hero Section */}
-        <div className="space-y-4 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-violet-600 dark:from-primary dark:via-blue-400 dark:to-indigo-300">
-            Բացահայտեք Ուսումնական Ծրագրեր
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl leading-relaxed">
-            Գտեք լավագույն կրթական նյութերը, դասընթացները և պլանները՝ ստեղծված առաջատար դպրոցների, համալսարանների, թանգարանների և կազմակերպությունների կողմից։
-          </p>
+        {/* Hero Section & Actions */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-6 shrink-0">
+          <div className="space-y-3 text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-violet-600 dark:from-primary dark:via-blue-400 dark:to-indigo-300">
+              Բացահայտեք Ուսումնական Ծրագրեր
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+              Գտեք լավագույն կրթական նյութերը, դասընթացները և պլանները՝ ստեղծված առաջատար հաստատությունների կողմից։
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 shrink-0">
+            <Button onClick={onAddOrg} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
+              <Plus className="h-4 w-4 text-muted-foreground" />
+              Նոր Հաստատություն
+            </Button>
+            <Button onClick={onAddTemplate} variant="outline" className="rounded-2xl px-4 h-11 border-dashed hover:bg-accent gap-2 transition-all">
+              <Plus className="h-4 w-4 text-muted-foreground" />
+              Նոր Կաղապար
+            </Button>
+            <Button onClick={onAddProgram} className="rounded-2xl px-5 h-11 shadow-md gap-2 transition-all">
+              <Plus className="h-4 w-4 text-primary-foreground" />
+              Նոր Ծրագիր
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filters panel */}
