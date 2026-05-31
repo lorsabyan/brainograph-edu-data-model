@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Program, Organization } from "@/lib/data";
 import { 
   Building2, 
@@ -63,6 +63,12 @@ export default function PortalView({
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<'org' | 'level'>('org');
+
+  const [selectedMySpaceSubject, setSelectedMySpaceSubject] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedMySpaceSubject(null);
+  }, [userRole, activeTab]);
 
   const LEVEL_GROUPS = useMemo(() => [
     { id: "school", name: "Դպրոցական", icon: GraduationCap, description: "Հանրակրթական հիմնական և օժանդակ դպրոցական առարկաներ" },
@@ -274,6 +280,22 @@ export default function PortalView({
     
     return cards;
   }, [programs, allNodes, selectedInstructorGrades]);
+
+  // Compute unique subject names available in current user's space cards
+  const availableSubjects = useMemo(() => {
+    const cards = userRole === "learner" ? learnerCards : instructorCards;
+    const titles = cards.map(c => c.program.title);
+    return Array.from(new Set(titles)).sort();
+  }, [userRole, learnerCards, instructorCards]);
+
+  // Compute final filtered cards for My Space
+  const filteredMySpaceCards = useMemo(() => {
+    const cards = userRole === "learner" ? learnerCards : instructorCards;
+    if (selectedMySpaceSubject) {
+      return cards.filter(c => c.program.title === selectedMySpaceSubject);
+    }
+    return cards;
+  }, [userRole, learnerCards, instructorCards, selectedMySpaceSubject]);
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -690,37 +712,72 @@ export default function PortalView({
           <div className="space-y-8 animate-in fade-in duration-300 text-left">
             {userRole === "learner" ? (
               /* Learner Profile Bar */
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl border border-border/50 bg-card/65 backdrop-blur-xl shadow-md text-left">
-                <div className="space-y-1">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                    Ուսումնական Մակարդակ
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Ընտրեք Ձեր ընթացիկ դասարանը կամ կուրսը՝ անձնական ծրագիրը տեսնելու համար։</p>
-                </div>
-                <div className="relative shrink-0 w-full sm:w-64">
-                  <select
-                    value={selectedLearnerGrade}
-                    onChange={(e) => onSelectLearnerGrade(e.target.value)}
-                    className="w-full bg-background border border-border/60 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer text-foreground"
-                  >
-                    <optgroup label="Դպրոցական դասարաններ">
-                      {["5-րդ դասարան", "6-րդ դասարան", "7-րդ դասարան", "8-րդ դասարան", "9-րդ դասարան", "10-րդ դասարան", "11-րդ դասարան", "12-րդ դասարան"].map(g => (
-                        <option key={g} value={g}>{g}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Բուհական կուրսեր">
-                      {["I Կուրս", "II Կուրս", "III Կուրս", "IV Կուրս"].map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </optgroup>
-                  </select>
-                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+              <div className="flex flex-col gap-4 p-5 rounded-2xl border border-border/50 bg-card/65 backdrop-blur-xl shadow-md text-left">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4 text-primary" />
+                      Ուսումնական Մակարդակ
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Ընտրեք Ձեր ընթացիկ դասարանը կամ կուրսը՝ անձնական ծրագիրը տեսնելու համար։</p>
+                  </div>
+                  <div className="relative shrink-0 w-full sm:w-64">
+                    <select
+                      value={selectedLearnerGrade}
+                      onChange={(e) => onSelectLearnerGrade(e.target.value)}
+                      className="w-full bg-background border border-border/60 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer text-foreground font-semibold"
+                    >
+                      <optgroup label="Դպրոցական դասարաններ">
+                        {["5-րդ դասարան", "6-րդ դասարան", "7-րդ դասարան", "8-րդ դասարան", "9-րդ դասարան", "10-րդ դասարան", "11-րդ դասարան", "12-րդ դասարան"].map(g => (
+                          <option key={g} value={g}>{g}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Բուհական կուրսեր">
+                        {["I Կուրս", "II Կուրս", "III Կուրս", "IV Կուրս"].map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
+
+                {/* Learner Subject Filter */}
+                {availableSubjects.length > 1 && (
+                  <div className="flex flex-wrap items-center gap-2 pt-3.5 border-t border-border/10">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-primary" />
+                      Առարկա՝
+                    </span>
+                    <button
+                      onClick={() => setSelectedMySpaceSubject(null)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
+                        selectedMySpaceSubject === null
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      Բոլորը
+                    </button>
+                    {availableSubjects.map(sub => (
+                      <button
+                        key={sub}
+                        onClick={() => setSelectedMySpaceSubject(selectedMySpaceSubject === sub ? null : sub)}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
+                          selectedMySpaceSubject === sub
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
+                            : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               /* Instructor Profile Bar */
@@ -758,6 +815,39 @@ export default function PortalView({
                     );
                   })}
                 </div>
+
+                {/* Instructor Subject Filter */}
+                {availableSubjects.length > 1 && (
+                  <div className="flex flex-wrap items-center gap-2 pt-3.5 border-t border-border/10">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-primary" />
+                      Առարկա՝
+                    </span>
+                    <button
+                      onClick={() => setSelectedMySpaceSubject(null)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
+                        selectedMySpaceSubject === null
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      Բոլորը
+                    </button>
+                    {availableSubjects.map(sub => (
+                      <button
+                        key={sub}
+                        onClick={() => setSelectedMySpaceSubject(selectedMySpaceSubject === sub ? null : sub)}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
+                          selectedMySpaceSubject === sub
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
+                            : "bg-background text-foreground border-border/60 hover:border-muted-foreground/40"
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -767,9 +857,9 @@ export default function PortalView({
                 {userRole === "learner" ? "Իմ Ուսումնական Առարկաները" : "Իմ Դասավանդման Առարկաները"}
               </h2>
 
-              {(userRole === "learner" ? learnerCards : instructorCards).length > 0 ? (
+              {filteredMySpaceCards.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
-                  {(userRole === "learner" ? learnerCards : instructorCards).map((card, index) => {
+                  {filteredMySpaceCards.map((card, index) => {
                     return (
                       <div
                         key={`${card.program.id}_${card.gradeName}_${index}`}
