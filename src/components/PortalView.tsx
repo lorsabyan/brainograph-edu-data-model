@@ -377,10 +377,35 @@ export default function PortalView({
                             
                             <div className="relative z-10 space-y-3">
                               <div className="flex justify-between items-center gap-2">
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${tMeta.color}`}>
-                                  <StructureIcon className="h-3 w-3" />
-                                  {tMeta.name}
-                                </span>
+                                <div className="flex flex-wrap gap-1 min-w-0">
+                                  {program.targetAudience && program.targetAudience.length > 0 ? (
+                                    program.targetAudience.map(audId => {
+                                      const audGroup = AUDIENCE_GROUPS.find(g => g.id === audId);
+                                      if (!audGroup) return null;
+                                      const AudIcon = audGroup.icon;
+                                      
+                                      let colorClass = "text-blue-500 bg-blue-500/10 border-blue-500/20";
+                                      if (audId === "դպրոցական հավելյալ") {
+                                        colorClass = "text-pink-500 bg-pink-500/10 border-pink-500/20";
+                                      } else if (audId === "բուհական") {
+                                        colorClass = "text-indigo-500 bg-indigo-500/10 border-indigo-500/20";
+                                      } else if (audId === "մասնագիտական") {
+                                        colorClass = "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
+                                      }
+
+                                      return (
+                                        <span key={audId} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${colorClass}`}>
+                                          <AudIcon className="h-2.5 w-2.5" />
+                                          {audGroup.name}
+                                        </span>
+                                      );
+                                    })
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border text-muted-foreground bg-muted border-border/50 shrink-0">
+                                      Լսարան չկա
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-1.5 min-w-0">
                                   {groupBy === 'audience' && (
                                     <span className="text-xs font-semibold text-muted-foreground truncate max-w-[120px]" title={organizations.find(o => o.id === program.organizationId)?.name}>
