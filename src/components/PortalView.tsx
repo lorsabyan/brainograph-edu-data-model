@@ -40,7 +40,6 @@ export default function PortalView({
   isEditMode
 }: PortalViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [selectedAudience, setSelectedAudience] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<'org' | 'audience'>('org');
@@ -61,12 +60,6 @@ export default function PortalView({
     tpl_freeform: { name: "Ազատ կառուցվածք", icon: FolderHeart, color: "text-pink-500 bg-pink-500/10 border-pink-500/20" },
   };
 
-  // Get active templates (those that actually have programs)
-  const activeTemplates = useMemo(() => {
-    const ids = new Set(programs.map(p => p.templateId));
-    return initialTemplates.filter(t => ids.has(t.id));
-  }, [programs]);
-
   // Filter programs based on criteria
   const filteredPrograms = useMemo(() => {
     return programs.filter(program => {
@@ -83,17 +76,12 @@ export default function PortalView({
         }
       }
 
-      // 2. Template Filter
-      if (selectedTemplateId && program.templateId !== selectedTemplateId) {
-        return false;
-      }
-
-      // 3. Organization Filter
+      // 2. Organization Filter
       if (selectedOrgId && program.organizationId !== selectedOrgId) {
         return false;
       }
 
-      // 4. Target Audience Filter
+      // 3. Target Audience Filter
       if (selectedAudience) {
         if (!program.targetAudience || !program.targetAudience.includes(selectedAudience)) {
           return false;
@@ -102,7 +90,7 @@ export default function PortalView({
 
       return true;
     });
-  }, [programs, organizations, searchQuery, selectedTemplateId, selectedOrgId, selectedAudience]);
+  }, [programs, organizations, searchQuery, selectedOrgId, selectedAudience]);
 
   // Group filtered programs by organization
   const programsByOrg = useMemo(() => {
@@ -145,7 +133,6 @@ export default function PortalView({
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedTemplateId(null);
     setSelectedOrgId(null);
     setSelectedAudience(null);
   };
@@ -209,7 +196,7 @@ export default function PortalView({
             </div>
 
             {/* Reset Filters Quick Button */}
-            {(searchQuery || selectedTemplateId || selectedOrgId || selectedAudience) && (
+            {(searchQuery || selectedOrgId || selectedAudience) && (
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
@@ -222,46 +209,6 @@ export default function PortalView({
           </div>
 
           <div className="space-y-4 border-t border-border/40 pt-4">
-            
-            {/* Template/Structure Filter */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-2 flex items-center gap-1.5">
-                <Filter className="h-3 w-3" />
-                Կառուցվածք՝
-              </span>
-              <button
-                onClick={() => setSelectedTemplateId(null)}
-                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border ${
-                  selectedTemplateId === null
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-background text-muted-foreground border-border/60 hover:border-muted-foreground/40 hover:text-foreground"
-                }`}
-              >
-                Բոլորը
-              </button>
-              {activeTemplates.map(t => {
-                const meta = templateMetadata[t.id as keyof typeof templateMetadata] || {
-                  name: t.name,
-                  icon: GraduationCap,
-                  color: "text-muted-foreground bg-muted border-border/50"
-                };
-                const IconComponent = meta.icon;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => setSelectedTemplateId(t.id)}
-                    className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all border flex items-center gap-1.5 ${
-                      selectedTemplateId === t.id
-                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                        : `bg-background text-foreground border-border/60 hover:border-muted-foreground/40`
-                    }`}
-                  >
-                    <IconComponent className="h-3.5 w-3.5" />
-                    {meta.name}
-                  </button>
-                );
-              })}
-            </div>
 
             {/* Target Audience Filter */}
             <div className="flex flex-wrap items-center gap-2">
@@ -315,10 +262,9 @@ export default function PortalView({
                 Բոլորը
               </button>
               {organizations.map(org => {
-                // Only show orgs that have matching programs after filtering by template and audience
+                // Only show orgs that have matching programs after filtering by audience
                 const hasMatchingPrograms = programs.some(
                   p => p.organizationId === org.id && 
-                       (!selectedTemplateId || p.templateId === selectedTemplateId) &&
                        (!selectedAudience || p.targetAudience?.includes(selectedAudience))
                 );
                 if (!hasMatchingPrograms) return null;
