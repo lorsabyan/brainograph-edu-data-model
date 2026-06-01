@@ -1,0 +1,12 @@
+.next
+node_modules
+npm-debug.log
+.git
+.gitignore
+.github
+*.png
+*.webm
+scraped_data.json
+js_bundle.js
+/tmp
+/scratch
