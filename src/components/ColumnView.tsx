@@ -86,8 +86,38 @@ export default function ColumnView({
               );
             }
 
+            const levelTitle = (() => {
+              if (nodesInCol.length === 0) return null;
+              const sampleNode = nodesInCol[0];
+              const nt = nodeTypes.find(t => t.id === sampleNode.nodeTypeId);
+              if (!nt) return null;
+              const pluralMap: Record<string, string> = {
+                "Դասարան": "Դասարաններ",
+                "Թեմա": "Թեմաներ",
+                "Նյութ/Դաս": "Դասեր և Նյութեր",
+                "Կուրս": "Կուրսեր",
+                "Առարկա": "Առարկաներ",
+                "Դասախոսություն": "Դասախոսություններ",
+                "Ցուցասրահ": "Ցուցասրահներ",
+                "Նմուշ/Էքսպոնատ": "Ցուցանմուշներ",
+                "Մոդուլ": "Մոդուլներ",
+                "Նյութ": "Նյութեր",
+                "Պանակ": "Պանակներ",
+                "Ֆայլ": "Ֆայլեր"
+              };
+              return pluralMap[nt.name] || `${nt.name}ներ`;
+            })();
+
             return (
               <div key={`col-${colParentId}`} style={{ width }} className="relative border-r bg-background shrink-0 flex flex-col h-full animate-in slide-in-from-left-4 duration-300 group/col">
+                {levelTitle && (
+                  <div className="px-4 py-3 border-b bg-accent/5 flex items-center justify-between shrink-0 h-[48px]">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      {levelTitle}
+                    </span>
+                  </div>
+                )}
                 <ScrollArea className="flex-1 min-h-0">
                   <div className="p-2 space-y-1">
                     

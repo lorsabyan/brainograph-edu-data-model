@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { ContentNode, nodeTypes, initialTemplates } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,6 +25,30 @@ export default function FolderView({
   isEditMode
 }: FolderViewProps) {
   
+  const levelTitle = useMemo(() => {
+    if (nodes.length === 0) return null;
+    const sampleNode = nodes[0];
+    const nt = nodeTypes.find(t => t.id === sampleNode.nodeTypeId);
+    if (!nt) return null;
+
+    const pluralMap: Record<string, string> = {
+      "Դասարան": "Դասարաններ",
+      "Թեմա": "Թեմաներ",
+      "Նյութ/Դաս": "Դասեր և Նյութեր",
+      "Կուրս": "Կուրսեր",
+      "Առարկա": "Առարկաներ",
+      "Դասախոսություն": "Դասախոսություններ",
+      "Ցուցասրահ": "Ցուցասրահներ",
+      "Նմուշ/Էքսպոնատ": "Ցուցանմուշներ",
+      "Մոդուլ": "Մոդուլներ",
+      "Նյութ": "Նյութեր",
+      "Պանակ": "Պանակներ",
+      "Ֆայլ": "Ֆայլեր"
+    };
+
+    return pluralMap[nt.name] || `${nt.name}ներ`;
+  }, [nodes]);
+
   if (nodes.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-accent/20 animate-in fade-in duration-500">
@@ -41,6 +66,12 @@ export default function FolderView({
   return (
     <ScrollArea className="flex-1 bg-accent/10">
       <div className="p-6">
+        {levelTitle && (
+          <h2 className="text-xl font-bold text-foreground/80 mb-6 border-b border-border/20 pb-3 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            {levelTitle}
+          </h2>
+        )}
         <div className={containerClass}>
           
           {nodes.map(node => {
