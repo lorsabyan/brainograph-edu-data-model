@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brainograph Edu Data Model Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #e2e8f0;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-rgb: 59, 130, 246;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --accent-rgb: 139, 92, 246;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --code-bg: #1e293b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      padding: 3rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-top: 2.5rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h2::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+      border-radius: 4px;
+    }
+
+    h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-top: 1.8rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+      text-align: justify;
+    }
+
+    strong {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+      margin-bottom: 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-cols: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-cols: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(var(--primary-rgb), 0.3);
+      box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .card h4 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    th, td {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: rgba(15, 23, 42, 0.5);
+      font-weight: 600;
+      color: #f8fafc;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .code-keyword { color: #f472b6; }
+    .code-string { color: #34d399; }
+    .code-comment { color: #64748b; font-style: italic; }
+    .code-number { color: #fbbf24; }
+
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(var(--primary-rgb), 0.2);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .highlight-box p {
+      color: var(--text-color);
+      font-size: 1.05rem;
+      margin-bottom: 0;
+    }
+
+    .highlight-box::before {
+      content: '💡';
+      position: absolute;
+      top: -15px;
+      left: 20px;
+      font-size: 1.5rem;
+      background-color: var(--bg-color);
+      padding: 0 5px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <span class="badge">Տվյալների Ճարտարապետություն</span>
+      <h1>Brainograph Edu Data Model</h1>
+      <p style="font-size: 1.2rem; color: #cbd5e1; margin-bottom: 0;">Կրթական առարկաների, ծրագրերի և անձնական տիրույթների ճկուն հիերարխիկ կառուցվածքը</p>
+    </header>
+
+    <h2>Նախաբան</h2>
+    <p>
+      <strong>Brainograph</strong> հարթակի տվյալների մոդելը նախագծված է որպես ունիվերսալ, երկչափ հիերարխիկ համակարգ, որը հնարավորություն է տալիս կրթական ցանկացած բովանդակություն (հանրակրթական դպրոց, բուհական դասընթացներ, ոչ ֆորմալ կրթություն և թանգարանային ցուցադրություններ) ներկայացնել մեկ միասնական տվյալների բազայի շրջանակներում:
+    </p>
+
+    <h2>Հիմնական Կառուցվածքային Օբյեկտները (Entities)</h2>
+    <p>Տվյալների կառուցվածքը կազմված է միմյանց հետ փոխկապակցված 5 հիմնական օբյեկտներից.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Օբյեկտի Անվանում</th>
+          <th>Նկարագրություն</th>
+          <th>Հիմնական Դաշտեր</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Հաստատություն (Organization)</strong></td>
+          <td>Կրթական բովանդակություն տրամադրող իրավաբանական անձ կամ հեղինակ (օր.՝ ԵՊՀ, Այբ, Վիզուալ Հայաստան):</td>
+          <td><code>id, name, logo, defaultTemplateId</code></td>
+        </tr>
+        <tr>
+          <td><strong>Կառուցվածք (HierarchyTemplate)</strong></td>
+          <td>Սահմանում է, թե տվյալ ծրագիրը քանի ներդրվածության մակարդակ ունի և ինչ տեսակի են դրանք:</td>
+          <td><code>id, name, description, isFreeform, nodeTypes</code></td>
+        </tr>
+        <tr>
+          <td><strong>Մակարդակի Տիպ (NodeType)</strong></td>
+          <td>Կառուցվածքի առանձին մակարդակ (օր.՝ Դասարան, Թեմա, Նյութ): Ունի սեփական պատկերակն ու կարգը:</td>
+          <td><code>id, name, level, icon, isNestable</code></td>
+        </tr>
+        <tr>
+          <td><strong>Ուսումնական Առարկա (Program)</strong></td>
+          <td>Կոնկրետ ուսումնական դասընթացը կամ առարկան: Այն կապվում է հաստատության և կառուցվածքի հետ:</td>
+          <td><code>id, title, description, organizationId, templateId, color, educationLevels, programStatuses, curriculum</code></td>
+        </tr>
+        <tr>
+          <td><strong>Հանգույց (ContentNode)</strong></td>
+          <td>Հիերարխիկ ծառի ֆիզիկական տարրերը (պանակներ, ֆայլեր, սահիկաշարեր կամ հղումներ/դյուրանցումներ):</td>
+          <td><code>id, programId, parentId, title, nodeTypeId, type, targetNodeId, metadata</code></td>
+        </tr>
+      </tbody>
+    </tbody>
+    </table>
+
+    <h2>Կրթական Մակարդակների Կաղապարները (Templates)</h2>
+    <p>Տվյալների մոդելն ապահովում է 5 տարբեր հիերարխիկ կառուցվածքների կաղապարներ, որոնք թույլ են տալիս ներկայացնել կրթության տարբեր ձևաչափերը.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h4>🏫 Առարկայական Ծրագիր</h4>
+        <p><strong>Դասարան &rarr; Թեմա &rarr; Նյութ/Դաս</strong><br>Նախատեսված է հանրակրթական պետական կամ հավելյալ ծրագրերի համար (օր.՝ Հայոց Պատմություն, Մաթեմատիկա):</p>
+      </div>
+      <div class="card">
+        <h4>🎓 Բուհական Ծրագիր</h4>
+        <p><strong>Կուրս &rarr; Առարկա &rarr; Դասախոսություն</strong><br>Հարմարեցված է ակադեմիական ուսուցման համակարգին (օր.՝ ԵՊՀ Տեղեկատվական Տեխնոլոգիաներ):</p>
+      </div>
+      <div class="card">
+        <h4>🏛️ Թանգարանային Վիրտուալ Ցուցադրություն</h4>
+        <p><strong>Ցուցասրահ &rarr; Ցուցանմուշ</strong><br>Թույլ է տալիս ստեղծել ոչ կլասիկ կրթական ցուցադրություններ (օր.՝ ՀՊԹ Վիրտուալ Ցուցասրահներ):</p>
+      </div>
+      <div class="card">
+        <h4>💼 Մասնագիտական Դասընթաց</h4>
+        <p><strong>Մոդուլ &rarr; Նյութ</strong><br>Կիրառվում է հանրային ոչ ֆորմալ դասընթացների, սեմինարների և թրեյնինգների համար (օր.՝ ԿԲ Ֆինանսական գրագիտություն):</p>
+      </div>
+      <div class="card" style="grid-column: 1 / -1;">
+        <h4>📂 Ազատ Կառուցվածք (Freeform)</h4>
+        <p><strong>Պանակ &rarr; Ֆայլ (անսահմանափակ ներդրվածություն)</strong><br>Թույլ է տալիս ստեղծել ազատ, չկանոնակարգված թղթապանակների համակարգ ստեղծագործական նախագծերի կամ անկախ փորձագետների համար:</p>
+      </div>
+    </div>
+
+    <h2>Անձնական Տիրույթ և Դինամիկ Ֆիլտրացիա (My Space)</h2>
+    <p>
+      Տվյալների մոդելը սովորողի և ուսուցանողի համար ապահովում է անհատականացված փորձառություն <strong>«Իմ Տիրույթը» (My Space)</strong> էջում.
+    </p>
+
+    <ul>
+      <li>
+        <strong>Սովորողի Տիրույթ (Learner Workspace)</strong><br>
+        Սովորողն ընտրում է իր դասարանը/կուրսը (օր.՝ 7-րդ դասարան): Համակարգը դինամիկ կերպով ստուգում է բոլոր ծրագրերի հանգույցները, առանձնացնում միայն տվյալ դասարանին վերաբերող առարկայական պանակները և ստեղծում <em>ուղիղ հղումներ (deep-links)</em> դեպի այդ պանակները՝ շրջանցելով ծրագրի արմատային մակարդակը:
+      </li>
+      <li>
+        <strong>Ուսուցանողի Տիրույթ (Instructor Workspace)</strong><br>
+        Ուսուցանողը կարող է դասավանդել <strong>մի քանի առարկա</strong> և <strong>մի քանի դասարանում</strong>: Նա իր պրոֆիլում նշում է իր դասարանները (օր.՝ 7-րդ, 8-րդ դասարաններ) և առարկաները (օր.՝ Հայոց Պատմություն, Աշխարհագրություն): Համակարգը գեներացնում է քարտեր միայն համապատասխանող համակցությունների (combinations) համար, ինչը թույլ է տալիս ուսուցանողին մեկ վայրից կառավարել իր բոլոր դասարանների ակտիվ նյութերը:
+      </li>
+      <li>
+        <strong>Պանակների մակարդակների վերնագրեր (Structural Headings)</strong><br>
+        Պանակներ կամ սյունակային տեսք (Column View) բացելիս, համակարգը դինամիկ կերպով կարդում է ակտիվ հանգույցների մակարդակի տիպը (`NodeType`) և ցուցադրում համապատասխան հայերեն հոգնակի վերնագիրը (օր.՝ <em>«Դասարաններ»</em>, <em>«Թեմաներ»</em>, <em>«Դասեր և Նյութեր»</em>, <em>«Դասախոսություններ»</em>): Սա օգնում է օգտատիրոջը հասկանալ, թե տվյալ պահին կառուցվածքի որ հարթության մեջ է գտնվում:
+      </li>
+    </ul>
+
+    <div class="highlight-box">
+      <p>
+        <strong>Նշանակությունը՝</strong> Տվյալների նման կառուցվածքը բացառում է կրնվող բովանդակության ստեղծումը: Օրինակ՝ «Աշխարհագրություն» առարկան ստեղծվում է մեկ անգամ, սակայն սովորողն իր դասարանից տեսնում է միայն իրեն հասանելի բաժինը, իսկ ուսուցանողը տեսնում և դասավանդում է իրեն վստահված դասարանների համապատասխան բաժինները:
+      </p>
+    </div>
+
+    <h2>Օրինակելի Տվյալների Ձևաչափ (JSON format)</h2>
+    <p>Ստորև ներկայացված է Ուսումնական Առարկայի և նրա հիերարխիկ Հանգույցի իրական JSON ներկայացումը.</p>
+
+    <div class="code-block">
+<span class="code-comment">// 1. Program Object (Ուսումնական Առարկա)</span>
+{
+  <span class="code-keyword">"id"</span>: <span class="code-string">"prog_0"</span>,
+  <span class="code-keyword">"title"</span>: <span class="code-string">"Հայոց պատմություն"</span>,
+  <span class="code-keyword">"description"</span>: <span class="code-string">"Աշխարհացույց նախագծի շրջանակներում ստեղծված ուսումնական նյութեր"</span>,
+  <span class="code-keyword">"organizationId"</span>: <span class="code-string">"org_vaf"</span>,
+  <span class="code-keyword">"templateId"</span>: <span class="code-string">"tpl_subject"</span>,
+  <span class="code-keyword">"color"</span>: <span class="code-string">"#f59e0b"</span>,
+  <span class="code-keyword">"educationLevels"</span>: [<span class="code-string">"school"</span>],
+  <span class="code-keyword">"programStatuses"</span>: [<span class="code-string">"state"</span>],
+  <span class="code-keyword">"curriculum"</span>: <span class="code-string">"Աշխարհացույց"</span>
+}
+
+<span class="code-comment">// 2. ContentNode Object (Հանգույց՝ Դասարան)</span>
+{
+  <span class="code-keyword">"id"</span>: <span class="code-string">"n_vaf_prog_0_g_12"</span>,
+  <span class="code-keyword">"programId"</span>: <span class="code-string">"prog_0"</span>,
+  <span class="code-keyword">"organizationId"</span>: <span class="code-string">"org_vaf"</span>,
+  <span class="code-keyword">"templateId"</span>: <span class="code-string">"tpl_subject"</span>,
+  <span class="code-keyword">"nodeTypeId"</span>: <span class="code-string">"type_grade"</span>, <span class="code-comment">// Սահմանում է, որ սա Դասարան մակարդակն է</span>
+  <span class="code-keyword">"parentId"</span>: <span class="code-number">null</span>,          <span class="code-comment">// Արմատային մակարդակն է</span>
+  <span class="code-keyword">"title"</span>: <span class="code-string">"7-րդ դասարան"</span>,
+  <span class="code-keyword">"sortOrder"</span>: <span class="code-number">3</span>,
+  <span class="code-keyword">"type"</span>: <span class="code-string">"node"</span>
+}
+    </div>
+
+    <footer>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">&copy; 2026 Brainograph Data Architecture. All rights reserved.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
